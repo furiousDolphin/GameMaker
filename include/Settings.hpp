@@ -12,16 +12,9 @@
 #include <vector>
 #include <functional>
 
-
-
 #include "Vector2D.hpp"
 #include "Texture.hpp"
-#include "Animation.hpp"
-
 #include "SDL_Management.hpp"
-
-
-
 
 /*-------------------------------------------------------------------------------*/
 
@@ -37,33 +30,12 @@ enum class ModeType
     EDITOR 
 };
 
-enum class CanvaType        
-{ 
-    OBJECT, 
-    TILE 
-};
-
-enum class WaterType        
-{ 
-    TOP, 
-    BOTTOM 
-};
-
-enum class CanvaObjectType 
-{ 
-    FOREGROUND, 
-    BACKGROUND, 
-    ENTITIES 
-};
-
 enum class FontTypes
 {
     MINECRAFT_18,
     MINECRAFT_24,
     MINECRAFT_36
 };
-
-
 
 namespace std 
 {
@@ -79,29 +51,8 @@ namespace std
 
 /*-------------------------------------------------------------------------------*/
 
-inline static std::string EDITOR_DATA_PATH { "editor_data.json" } ;
-
-struct EditorDataSequenceType
-{
-    std::string style;
-    std::string type;
-    std::string menu;
-    std::string menu_surf;
-    std::string preview;
-    std::string graphics;
-};
-
-using EditorDataType       = std::unordered_map< int, EditorDataSequenceType >;
-using PreviewTexturesType  = std::unordered_map< int, std::pair< CanvaType, Texture> >;
-using MenuTexturesType     = std::unordered_map< std::string, std::vector<std::pair<int, Texture>> >;
-using EditorAnimationsType = std::unordered_map< int, Animation >;
-
-
 class EditorGraphics;
-class GraphicsManager;
 class EventManager;
-
-
 
 struct AppContext
 {   
@@ -109,18 +60,14 @@ struct AppContext
     SDL_Renderer*    renderer;
     EventManager&    event_manager;
     ModeType&        mode_type;
-    GraphicsManager& graphics_manager;
     std::unordered_map< FontTypes, FontManager >& fonts;
 };
 
 struct EditorContext
 {
     EventManager&    event_manager;
-    EditorDataType&  editor_data;
     SDL_Renderer*    renderer;
     Vector2D<int>&   origin;
-    int&             canva_id;
-    EditorGraphics&  editor_graphics;
 };
 
 /*-------------------------------------------------------------------------------*/

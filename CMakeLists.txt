@@ -61,19 +61,13 @@ target_link_libraries(base_module_library INTERFACE
 )
 
 target_compile_definitions(base_module_library INTERFACE WITHOUT_NUMPY SDL_MAIN_HANDLED)
-add_executable(GameMakerApp main.cpp src/SDL_Management.cpp
-                     src/FileManagement.cpp
-                     src/Animation.cpp
-                     src/App.cpp
-                     src/EventManager.cpp
-                     src/EditorMode.cpp
-                     src/GameMode.cpp
-                     src/CanvaObject.cpp
-                     src/CanvaTile.cpp
-                     src/EditorMenu.cpp
-                     src/Button.cpp
-                     src/GraphicsManager.cpp
-                     src/EditorGraphics.cpp)
+add_executable(GameMakerApp 
+  main.cpp 
+  src/SDL_Management.cpp
+  src/App.cpp
+  src/EventManager.cpp
+  src/EditorMode.cpp
+  src/GameMode.cpp )
 target_link_libraries(GameMakerApp PRIVATE base_module_library)
 
 set_target_properties(GameMakerApp PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE")

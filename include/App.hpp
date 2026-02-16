@@ -12,11 +12,8 @@
 #include <memory>
 
 #include "Settings.hpp"
-
 #include "EventManager.hpp"
-#include "GraphicsManager.hpp"
 #include "SDL_Management.hpp"
-
 #include "Mode.hpp"
 
 
@@ -38,7 +35,6 @@ class App
         SDL_Renderer*   renderer_;
         EventManager    event_manager_;
         ModeType        mode_type_;
-        GraphicsManager graphics_manager_;
 
         std::unordered_map< FontTypes, FontManager > fonts_;
 
@@ -52,11 +48,6 @@ class App
         std::unique_ptr<EditorMode> editor_mode_;
 
         std::unordered_map< ModeType, std::unique_ptr<Mode> > modes_map_;
-
-
-
-        
-
 };
 
 #endif

@@ -2,7 +2,6 @@
 #include <memory>
 #include <iomanip>
 
-#include "FileMenagement.hpp"
 #include "App.hpp"
 #include "GameMode.hpp"
 #include "EditorMode.hpp"
@@ -12,13 +11,11 @@ App::App( SDL_Window* window, SDL_Renderer* renderer ):
     renderer_        { renderer          },
     event_manager_   {                   },
     mode_type_       { ModeType::EDITOR  },
-    graphics_manager_{ renderer          },
     fonts_           {                   },
     app_context_     { window,
                        renderer, 
                        event_manager_, 
                        mode_type_,
-                       graphics_manager_,
                        fonts_            },
     modes_map_       {                   }
 {
