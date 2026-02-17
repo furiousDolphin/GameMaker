@@ -11,15 +11,18 @@
 #include "Mode.hpp"
 #include "EventManager.hpp"
 #include "Button.hpp"
+#include "CanvaTile.hpp"
+
+
 
 
 
 class EditorMode : public Mode
 {
     public:
-        EditorMode( AppContext& app_context );
+        EditorMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, ModeType& mode_type );
 
-        void run( float dt );
+        void run( float dt ) override;
 
     private:
         void create_buttons();
@@ -33,7 +36,14 @@ class EditorMode : public Mode
         Vector2D<int> origin_;
         Vector2D<int> mouse_origin_vector_;  
         Vector2D<int> grid_pos_;
-        EditorContext editor_context_;
+
+        struct Context
+        {
+            SDL_Renderer* renderer;
+            EventManager& event_manager;
+            GraphicsManager& graphics_manager;
+            ModeType& mode_type;
+        } context_;
 
         Buttons buttons_;
 };

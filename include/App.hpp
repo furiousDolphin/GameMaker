@@ -40,8 +40,6 @@ class App
         GraphicsManager graphics_manager_;
         ModeType        mode_type_;
 
-        AppContext app_context_;
-
         Uint32 last_time_;
         Uint32 current_time_;
         float delta_time_;

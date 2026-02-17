@@ -32,8 +32,6 @@ enum class ModeType
     EDITOR 
 };
 
-
-
 namespace std 
 {
     template<>
@@ -47,31 +45,5 @@ namespace std
 }
 
 /*-------------------------------------------------------------------------------*/
-
-class EventManager;
-class GraphicsManager;
-
-struct AppContext
-{   
-    SDL_Window*      window;
-    SDL_Renderer*    renderer;
-    EventManager&    event_manager;
-    GraphicsManager& graphics_manager;
-    ModeType&        mode_type;
-};
-
-struct EditorContext
-{
-    SDL_Renderer*    renderer;
-    EventManager&    event_manager;
-    GraphicsManager& graphics_manager;
-    Vector2D<int>&   origin;
-};
-
-/*-------------------------------------------------------------------------------*/
-
-
-
-
 
 #endif

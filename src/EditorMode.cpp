@@ -7,29 +7,23 @@ namespace fs = std::filesystem;
 
 #include "EditorMode.hpp"
 
-EditorMode::EditorMode( AppContext& app_context ):
-    Mode{ app_context },
-    editor_context_ 
-    { 
-        app_context_.renderer,
-        app_context.event_manager,
-        app_context.graphics_manager, 
-        origin_ 
-    }
+EditorMode::EditorMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, ModeType& mode_type ):
+    context_{renderer, event_manager, graphics_manager, mode_type},
+    buttons_{event_manager, graphics_manager}
 {
     this->create_buttons();
 }
 
 void EditorMode::create_buttons()
 {
-    const auto& textures = app_context_.graphics_manager.get_texture("GAME", GraphicsManager::MINECRAFT_24);
-    buttons_.add(std::make_unique<TextButton>(Vector2D<int>(0, 0), [this](){app_context_.mode_type = ModeType::GAME;}, textures));
+    const auto& textures = context_.graphics_manager.get_texture("GAME", GraphicsManager::MINECRAFT_24);
+    buttons_.add(std::make_unique<TextButton>(Vector2D<int>(0, 0), [this](){context_.mode_type = ModeType::GAME;}, textures));
 }
 
 void EditorMode::draw_grid() const
 {
 
-    SDL_Renderer* renderer = app_context_.renderer;
+    SDL_Renderer* renderer = context_.renderer;
 
     int x_offset = origin_.x % TILE_SIZE;
     int y_offset = origin_.y % TILE_SIZE;
@@ -45,7 +39,7 @@ void EditorMode::draw_grid() const
 
 void EditorMode::pan_input()
 {
-    const EventManager event_manager = app_context_.event_manager;
+    const EventManager event_manager = context_.event_manager;
     const Vector2D<int> mouse_pos = event_manager.mouse_pos();
 
     if( event_manager.middle_got_clicked() )
@@ -57,7 +51,7 @@ void EditorMode::pan_input()
 
 void EditorMode::update_grid_pos()
 {
-    Vector2D<int> mouse_pos = app_context_.event_manager.mouse_pos();
+    Vector2D<int> mouse_pos = context_.event_manager.mouse_pos();
     auto [ x, y ] = mouse_pos - origin_;
       
     grid_pos_.x = static_cast<int>( x/TILE_SIZE ) - ( ( x < 0 ) ? 1 : 0);
@@ -66,15 +60,14 @@ void EditorMode::update_grid_pos()
 
 void EditorMode::update( float dt )
 {
-    const auto& event_manager = app_context_.event_manager;
     this->pan_input();
     this->update_grid_pos();  
-    buttons_.update(event_manager);
+    buttons_.update();
 }
 
 void EditorMode::render()
 {
-    SDL_Renderer* renderer = app_context_.renderer;
+    SDL_Renderer* renderer = context_.renderer;
     SDL_SetRenderDrawColor( renderer, 0xff, 0xff, 0xff, 0xff );
     SDL_RenderClear( renderer );
 

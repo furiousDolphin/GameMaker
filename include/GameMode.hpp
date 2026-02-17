@@ -13,17 +13,28 @@
 #include "EventManager.hpp"
 #include "GraphicsManager.hpp"
 
+
+
+
 class GameMode : public Mode
 {
     public:
-        GameMode( AppContext& app_context );
+        GameMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, ModeType& mode_type );
 
-        void run( float dt );
+        void run( float dt ) override;
 
     private:
         void update();
         void render();
         void create_buttons();
+
+        struct Context
+        {
+            SDL_Renderer* renderer;
+            EventManager& event_manager;
+            GraphicsManager& graphics_manager;
+            ModeType& mode_type;
+        } context_;
 
         Buttons buttons_;
 };

@@ -42,14 +42,17 @@ void TextButton::render() const
 }
 
 
+Buttons::Buttons(EventManager& event_manager, GraphicsManager& graphics_manager) :
+    context_{event_manager, graphics_manager}
+{}
 
-bool Buttons::update( const EventManager& event_manager )
+bool Buttons::update()
 {
     bool any = false;
 
         for ( auto& button : buttons_ )
         {
-            any = button->update(event_manager);
+            any = button->update(context_.event_manager);
             if ( any )
             { break; }
         }

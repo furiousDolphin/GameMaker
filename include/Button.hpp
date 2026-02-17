@@ -34,6 +34,7 @@ class Button
 
 };
 
+
 class TextButton : public Button
 {
     public:
@@ -52,15 +53,27 @@ class TextButton : public Button
 
 };
 
+struct ButtonsContext
+{
+    EventManager& event_manager;
+    GraphicsManager& graphics_manager;
+};
+
 class Buttons
 {
     public:
-        Buttons() = default;
-        bool update( const EventManager& event_manager );
+        Buttons(EventManager& event_manager, GraphicsManager& graphics_manager);
+        bool update();
         void render() const;
         void add( std::unique_ptr<Button> button );
     private:
         std::vector<std::unique_ptr<Button>> buttons_;
+
+        struct Context
+        {
+            EventManager& event_manager;
+            GraphicsManager& graphics_manager;
+        } context_;
 };
 
 #endif

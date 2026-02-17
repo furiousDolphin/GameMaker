@@ -13,15 +13,8 @@
 
 class Mode
 {
-    public:
-        Mode( AppContext& app_context ):
-            app_context_{ app_context }
-        {}
-        
+    public:        
         virtual void run( float dt ) = 0;
-
-    protected:
-        AppContext& app_context_;
 };
 
 #endif
