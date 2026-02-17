@@ -9,6 +9,9 @@
 
 #include "Mode.hpp"
 #include "Settings.hpp"
+#include "Button.hpp"
+#include "EventManager.hpp"
+#include "GraphicsManager.hpp"
 
 class GameMode : public Mode
 {
@@ -20,6 +23,9 @@ class GameMode : public Mode
     private:
         void update();
         void render();
+        void create_buttons();
+
+        Buttons buttons_;
 };
 
 #endif

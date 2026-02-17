@@ -1,0 +1,109 @@
+
+#include "GraphicsManager.hpp"
+
+#include <sstream>
+#include <filesystem>
+namespace fs = std::filesystem;
+
+GraphicsManager::GraphicsManager( SDL_Renderer* renderer ) :
+    renderer_{renderer}
+{
+    for (const auto& [folder_path, key] : vectorized_textures_as_path_key_map)
+    { vectorized_textures_as_map_.emplace(key, VectorizedTextures{renderer, folder_path}); }
+
+    for ( const auto& [file_path, key] : singular_textures_as_path_key_map )
+    { textures_as_map_[key] = Texture{renderer, file_path}; }
+
+    fonts_.emplace( FontKey::MINECRAFT_18, FontManager( "data/fonts/MinecraftBold-nMK1.otf", 18 ) );
+    fonts_.emplace( FontKey::MINECRAFT_24, FontManager( "data/fonts/MinecraftBold-nMK1.otf", 24 ) );
+    fonts_.emplace( FontKey::MINECRAFT_36, FontManager( "data/fonts/MinecraftBold-nMK1.otf", 36 ) );    
+}
+
+const Texture& GraphicsManager::get_texture( SingularTextureKey key ) const
+{ return textures_as_map_.at(key); }
+
+const Texture& GraphicsManager::get_texture( VectorizedTextureKey key, int index ) const
+{ return vectorized_textures_as_map_.at(key)[index]; }
+
+const GraphicsManager::TextButtonTextures& GraphicsManager::get_texture(const std::string& text, FontKey font_key)
+{
+    std::pair<std::string, FontKey> key{text, font_key};
+
+    auto it = text_buttons_textures_as_map_.find(key);
+    if (it != text_buttons_textures_as_map_.end()) {
+        return it->second;
+    }
+
+    auto& font_manager = fonts_.at(font_key);
+    TTF_Font* raw_font = font_manager.get_font(); 
+
+    TextButtonTextures text_buttons_textures{ 
+        Texture(renderer_, text, { 0x00, 0x00, 0xff }, raw_font),
+        Texture(renderer_, text, { 0x00, 0xff, 0x00 }, raw_font)
+    };
+
+    auto [inserted_it, success] = text_buttons_textures_as_map_.emplace(key, std::move(text_buttons_textures));
+    return inserted_it->second;
+}
+
+GraphicsManager::VectorizedTextures::VectorizedTextures(SDL_Renderer* renderer, const std::string& folder_path)
+{
+    
+    std::vector<fs::path> paths;
+    for ( const auto& entry : fs::directory_iterator(folder_path) )
+    {
+        if ( entry.is_regular_file() && entry.path().extension() == ".png" )
+        { paths.push_back(entry.path()); }
+    }
+
+    std::sort(paths.begin(), paths.end());
+
+    int index = 0;
+    for ( const fs::path& path : paths )
+    {
+        std::string stem = path.stem().string();
+        textures_.emplace_back(renderer, path.string());
+        name_to_index_translator_[stem] = index++;
+    }
+}
+
+const Texture& GraphicsManager::VectorizedTextures::operator[](int index) const
+{ return textures_[index]; }
+
+std::optional<int> GraphicsManager::VectorizedTextures::get_index_from_name(const std::string& texture_name) const
+{
+    auto it = name_to_index_translator_.find(texture_name);
+    return (it != name_to_index_translator_.end()) ? std::optional<int>(it->second) : std::nullopt;
+}
+
+std::vector<std::string> get_file_names_from_folder(const std::string& folder_path)
+{
+    std::vector<std::string> result;
+
+    try
+    {  
+        for( const auto& entry : fs::directory_iterator( folder_path ) )
+        {
+            if( entry.is_regular_file() && entry.path().extension() == ".png" )
+            { result.push_back( entry.path().filename().string() ); }
+        }
+    }
+    catch(const std::exception& e)
+    { std::cerr << e.what() << '\n'; }
+
+    std::sort(
+        result.begin(), 
+        result.end(), 
+        [](const std::string& a, const std::string& b) 
+        {
+            return std::lexicographical_compare(
+                a.begin(), 
+                a.end(), 
+                b.begin(), 
+                b.end(),
+                [](char c1, char c2)
+                { return std::tolower(c1) < std::tolower(c2); });
+        });
+
+    return result;  
+}

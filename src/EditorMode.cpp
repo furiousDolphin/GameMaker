@@ -9,12 +9,21 @@ namespace fs = std::filesystem;
 
 EditorMode::EditorMode( AppContext& app_context ):
     Mode{ app_context },
-    editor_context_ { app_context.event_manager,
-                      app_context_.renderer, 
-                      origin_ }
-
+    editor_context_ 
+    { 
+        app_context_.renderer,
+        app_context.event_manager,
+        app_context.graphics_manager, 
+        origin_ 
+    }
 {
+    this->create_buttons();
+}
 
+void EditorMode::create_buttons()
+{
+    const auto& textures = app_context_.graphics_manager.get_texture("GAME", GraphicsManager::MINECRAFT_24);
+    buttons_.add(std::make_unique<TextButton>(Vector2D<int>(0, 0), [this](){app_context_.mode_type = ModeType::GAME;}, textures));
 }
 
 void EditorMode::draw_grid() const
@@ -57,8 +66,10 @@ void EditorMode::update_grid_pos()
 
 void EditorMode::update( float dt )
 {
+    const auto& event_manager = app_context_.event_manager;
     this->pan_input();
     this->update_grid_pos();  
+    buttons_.update(event_manager);
 }
 
 void EditorMode::render()
@@ -68,6 +79,7 @@ void EditorMode::render()
     SDL_RenderClear( renderer );
 
     this->draw_grid();
+    buttons_.render();
 
     SDL_RenderPresent( renderer );
 }

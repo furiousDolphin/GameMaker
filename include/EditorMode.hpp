@@ -10,6 +10,7 @@
 #include "Settings.hpp"
 #include "Mode.hpp"
 #include "EventManager.hpp"
+#include "Button.hpp"
 
 
 
@@ -21,6 +22,7 @@ class EditorMode : public Mode
         void run( float dt );
 
     private:
+        void create_buttons();
         void pan_input();
         void update_grid_pos();
         void draw_grid() const;
@@ -32,6 +34,8 @@ class EditorMode : public Mode
         Vector2D<int> mouse_origin_vector_;  
         Vector2D<int> grid_pos_;
         EditorContext editor_context_;
+
+        Buttons buttons_;
 };
 
 

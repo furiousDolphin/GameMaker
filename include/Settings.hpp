@@ -16,6 +16,8 @@
 #include "Texture.hpp"
 #include "SDL_Management.hpp"
 
+
+
 /*-------------------------------------------------------------------------------*/
 
 inline constexpr int WIDTH     = 960;
@@ -30,12 +32,7 @@ enum class ModeType
     EDITOR 
 };
 
-enum class FontTypes
-{
-    MINECRAFT_18,
-    MINECRAFT_24,
-    MINECRAFT_36
-};
+
 
 namespace std 
 {
@@ -51,22 +48,23 @@ namespace std
 
 /*-------------------------------------------------------------------------------*/
 
-class EditorGraphics;
 class EventManager;
+class GraphicsManager;
 
 struct AppContext
 {   
     SDL_Window*      window;
     SDL_Renderer*    renderer;
     EventManager&    event_manager;
+    GraphicsManager& graphics_manager;
     ModeType&        mode_type;
-    std::unordered_map< FontTypes, FontManager >& fonts;
 };
 
 struct EditorContext
 {
-    EventManager&    event_manager;
     SDL_Renderer*    renderer;
+    EventManager&    event_manager;
+    GraphicsManager& graphics_manager;
     Vector2D<int>&   origin;
 };
 

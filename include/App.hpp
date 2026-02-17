@@ -13,6 +13,7 @@
 
 #include "Settings.hpp"
 #include "EventManager.hpp"
+#include "GraphicsManager.hpp"
 #include "SDL_Management.hpp"
 #include "Mode.hpp"
 
@@ -20,6 +21,8 @@
 
 class GameMode; 
 class EditorMode; 
+
+
 
 
 class App
@@ -34,9 +37,8 @@ class App
         SDL_Window*     window_;
         SDL_Renderer*   renderer_;
         EventManager    event_manager_;
+        GraphicsManager graphics_manager_;
         ModeType        mode_type_;
-
-        std::unordered_map< FontTypes, FontManager > fonts_;
 
         AppContext app_context_;
 
