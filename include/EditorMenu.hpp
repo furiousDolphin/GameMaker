@@ -25,7 +25,7 @@ class EditorMenu
             EditorDataManager& editor_data_manager, 
             int& canva_id );
 
-        void update();
+        bool update();
         void render();
 
     private:

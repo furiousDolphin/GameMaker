@@ -69,8 +69,18 @@ void EditorMenu::create_data()
     }
 }
 
-void EditorMenu::update()
-{ buttons_.update(); }
+bool EditorMenu::update()
+{
+    Vector2D<int> mouse_pos = context_.event_manager.mouse_pos(); 
+
+    bool collision = false;
+    if ( rect_.collide_point(mouse_pos) )
+    {
+        collision = true;
+        buttons_.update();
+    }
+    return collision;
+}
 
 void EditorMenu::render()
 { buttons_.render(); }

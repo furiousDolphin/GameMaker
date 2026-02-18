@@ -37,12 +37,7 @@ class CanvaTile
         void render( const Vector2D<int>& origin, const GraphicsManager& graphics_manager ) const;
 
         Vector2D<int> grid_pos_;
-
-        bool has_land_;
         int  land_index_;
-
-        bool has_water_;
-
         bool neighbours_flag_;
 
         std::vector< std::pair< Vector2D<int>, int > > objects_;       

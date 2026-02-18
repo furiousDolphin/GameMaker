@@ -55,8 +55,8 @@ void EditorMode::update( float dt )
 {
     this->pan_input();
     buttons_.update();
-    menu_.update();
-    canva_tiles_.update();
+    if (!menu_.update())
+    { canva_tiles_.update(); }
 }
 
 void EditorMode::render()

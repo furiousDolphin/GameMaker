@@ -6,34 +6,40 @@
 
 CanvaTile::CanvaTile( Vector2D<int> grid_pos ): 
     grid_pos_  { grid_pos },
-    has_land_  { false    },
-    has_water_ { false    }
+    land_index_ {-1}
 {}
 
 bool CanvaTile::get_neighbours_flag() const
 { return neighbours_flag_; }
 
 bool CanvaTile::has_land() const 
-{ return this->land_index_ != -1; }
+{ return land_index_ != -1; }
 
 void CanvaTile::add_id( int canva_id, const std::string& style )
 {
     neighbours_flag_ = false;
 
-         if( style == "terrain" && !has_land_    ) { has_land_  = true; neighbours_flag_ = true; }
-    else if( style == "water"   && !has_water_   ) { has_water_ = true; neighbours_flag_ = true; }
+    if( style == "terrain" && !this->has_land() ) 
+    { 
+        land_index_ = 0;
+        neighbours_flag_ = true; 
+    }
 }
 
 void CanvaTile::remove_id( int canva_id, const std::string& style )
 {
     neighbours_flag_ = false;
 
-         if( style == "terrain" && has_land_    ) { has_land_  = false; neighbours_flag_ = true; }
-    else if( style == "water"   && has_water_   ) { has_water_ = false; neighbours_flag_ = true; }
+    if( style == "terrain" && this->has_land() ) 
+    { 
+        land_index_ = -1; 
+        neighbours_flag_ = true; 
+    }
+
 }
 
 bool CanvaTile::any_id() const
-{ return ( has_land_ || has_water_ ); }
+{ return ( this->has_land() ); }
 
 void CanvaTile::update()
 {}
@@ -42,7 +48,7 @@ void CanvaTile::render( const Vector2D<int>& origin, const GraphicsManager& grap
 {
     auto render_grid_pos = grid_pos_*TILE_SIZE + origin;
 
-    if( has_land_ ) 
+    if( this->has_land() ) 
     {
         const auto& land_textures = graphics_manager.get_vectorized_textures(GraphicsManager::LAND);
         land_textures[land_index_].render( render_grid_pos );
