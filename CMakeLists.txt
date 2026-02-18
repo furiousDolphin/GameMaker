@@ -66,10 +66,13 @@ add_executable(GameMakerApp
   src/SDL_Management.cpp
   src/App.cpp
   src/EventManager.cpp
-  src/Graphicsmanager.cpp
+  src/GraphicsManager.cpp
   src/EditorMode.cpp
   src/GameMode.cpp
-  src/Button.cpp )
+  src/Button.cpp
+  src/EditorDataManager.cpp
+  src/EditorMenu.cpp
+  src/CanvaTile.cpp )
 target_link_libraries(GameMakerApp PRIVATE base_module_library)
 
 set_target_properties(GameMakerApp PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE")

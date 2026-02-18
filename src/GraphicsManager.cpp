@@ -22,28 +22,56 @@ GraphicsManager::GraphicsManager( SDL_Renderer* renderer ) :
 const Texture& GraphicsManager::get_texture( SingularTextureKey key ) const
 { return textures_as_map_.at(key); }
 
-const Texture& GraphicsManager::get_texture( VectorizedTextureKey key, int index ) const
-{ return vectorized_textures_as_map_.at(key)[index]; }
+const GraphicsManager::VectorizedTextures& GraphicsManager::get_vectorized_textures( VectorizedTextureKey key) const
+{ return vectorized_textures_as_map_.at(key); }
 
-const GraphicsManager::TextButtonTextures& GraphicsManager::get_texture(const std::string& text, FontKey font_key)
+const GraphicsManager::TextButtonTextures* GraphicsManager::get_text_button_textures_ptr( const std::string& text, FontKey font_key) const
 {
     std::pair<std::string, FontKey> key{text, font_key};
 
     auto it = text_buttons_textures_as_map_.find(key);
     if (it != text_buttons_textures_as_map_.end()) {
-        return it->second;
+        return &(it->second);
     }
 
     auto& font_manager = fonts_.at(font_key);
-    TTF_Font* raw_font = font_manager.get_font(); 
+    const TTF_Font* raw_font = font_manager.get_font(); 
 
     TextButtonTextures text_buttons_textures{ 
-        Texture(renderer_, text, { 0x00, 0x00, 0xff }, raw_font),
-        Texture(renderer_, text, { 0x00, 0xff, 0x00 }, raw_font)
+        Texture(renderer_, text, SDL_Color{ 0x00, 0x00, 0xff }, raw_font),
+        Texture(renderer_, text, SDL_Color{ 0x00, 0xff, 0x00 }, raw_font)
     };
 
     auto [inserted_it, success] = text_buttons_textures_as_map_.emplace(key, std::move(text_buttons_textures));
-    return inserted_it->second;
+    return &(inserted_it->second);
+}
+
+const Texture* GraphicsManager::get_dynamic_texture_ptr(const std::string& file_path) const
+{
+    auto it = dynamic_textures_.find(file_path);
+    if ( it != dynamic_textures_.end() )
+    { return &(it->second); }
+
+    try 
+    {
+        Texture texture{renderer_, file_path};
+        auto [inserted_it, success] =  dynamic_textures_.emplace(file_path, std::move(texture));
+        return &(inserted_it->second);
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << "\n";
+        return nullptr;
+    }
+}
+
+GraphicsManager::FoundItems GraphicsManager::find_items_by_path(const std::string& path) const
+{
+    //zastapic std::variant
+    return FoundItems{
+        this->get_ptr_by_path(path, singular_textures_as_path_key_map, textures_as_map_),
+        this->get_ptr_by_path(path, vectorized_textures_as_path_key_map, vectorized_textures_as_map_),
+    };
 }
 
 GraphicsManager::VectorizedTextures::VectorizedTextures(SDL_Renderer* renderer, const std::string& folder_path)

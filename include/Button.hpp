@@ -15,21 +15,18 @@
 #include "GraphicsManager.hpp"
 #include "SDL_Management.hpp"
 
+class Buttons;
 class Button
 {
     public:
-        Button( Vector2D<int> pos, std::function< void(void) > func );
+        friend Buttons;
 
+        Button( Vector2D<int> pos );
         virtual ~Button() = default;
-
+        
+    protected:
         virtual bool update( const EventManager& event_manager ) = 0;
         virtual void render() const = 0;
-        
-        Vector2D<int> get_pos();
-        void set_pos( Vector2D<int> pos );
-
-    protected:
-        std::function< void(void) > func_;
         Rect rect_;
 
 };
@@ -38,20 +35,52 @@ class Button
 class TextButton : public Button
 {
     public:
+        friend Buttons;
+
         TextButton( 
             Vector2D<int> pos, 
             std::function< void(void) > func,
-            const GraphicsManager::TextButtonTextures& textures
+            const GraphicsManager::TextButtonTextures* textures
         );
 
-        bool update( const EventManager& event_manager ) override;
-        void render() const override;
 
     private:
-       const GraphicsManager::TextButtonTextures& textures_;
-       bool is_marked_;
+        bool update( const EventManager& event_manager ) override;
+        void render() const override;
+        const GraphicsManager::TextButtonTextures* textures_;
+        std::function< void(void) > func_;
+        bool is_marked_;
 
 };
+
+
+class EditorMenuButton : public Button
+{
+    public:
+        friend Buttons;
+
+        EditorMenuButton( 
+            Vector2D<int> pos,
+            std::function< void(int) > func, 
+            const std::vector< std::pair< int, const Texture* > >*  main_textures,
+            const std::vector< std::pair< int, const Texture* > >*  alt_textures = nullptr );
+
+    private:
+        bool update( const EventManager& event_manager ) override;
+        void render() const override;
+        int  get_id() const;                         
+        void update_rect(); 
+
+        const std::vector< std::pair< int, const Texture* > >* main_textures_;
+        const std::vector< std::pair< int, const Texture* > >* alt_textures_;
+        std::function< void(int) > func_;
+
+        int texture_index_;
+        bool main_active_;
+
+        Vector2D<int> referencial_pos_;
+};
+
 
 struct ButtonsContext
 {

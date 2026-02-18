@@ -9,20 +9,22 @@ namespace fs = std::filesystem;
 
 EditorMode::EditorMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, ModeType& mode_type ):
     context_{renderer, event_manager, graphics_manager, mode_type},
-    buttons_{event_manager, graphics_manager}
+    buttons_{event_manager, graphics_manager},
+    data_manager_{graphics_manager},
+    menu_{event_manager, graphics_manager, origin_, data_manager_, canva_id_},
+    canva_tiles_{event_manager, graphics_manager, origin_, data_manager_, canva_id_}
 {
     this->create_buttons();
 }
 
 void EditorMode::create_buttons()
 {
-    const auto& textures = context_.graphics_manager.get_texture("GAME", GraphicsManager::MINECRAFT_24);
+    const auto* textures = context_.graphics_manager.get_text_button_textures_ptr("GAME", GraphicsManager::MINECRAFT_24);
     buttons_.add(std::make_unique<TextButton>(Vector2D<int>(0, 0), [this](){context_.mode_type = ModeType::GAME;}, textures));
 }
 
 void EditorMode::draw_grid() const
 {
-
     SDL_Renderer* renderer = context_.renderer;
 
     int x_offset = origin_.x % TILE_SIZE;
@@ -49,20 +51,12 @@ void EditorMode::pan_input()
     { origin_ = mouse_pos - mouse_origin_vector_; }
 }
 
-void EditorMode::update_grid_pos()
-{
-    Vector2D<int> mouse_pos = context_.event_manager.mouse_pos();
-    auto [ x, y ] = mouse_pos - origin_;
-      
-    grid_pos_.x = static_cast<int>( x/TILE_SIZE ) - ( ( x < 0 ) ? 1 : 0);
-    grid_pos_.y = static_cast<int>( y/TILE_SIZE ) - ( ( y < 0 ) ? 1 : 0);
-}
-
 void EditorMode::update( float dt )
 {
     this->pan_input();
-    this->update_grid_pos();  
     buttons_.update();
+    menu_.update();
+    canva_tiles_.update();
 }
 
 void EditorMode::render()
@@ -72,7 +66,9 @@ void EditorMode::render()
     SDL_RenderClear( renderer );
 
     this->draw_grid();
+    canva_tiles_.render();
     buttons_.render();
+    menu_.render();
 
     SDL_RenderPresent( renderer );
 }

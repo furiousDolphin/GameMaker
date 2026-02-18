@@ -110,6 +110,15 @@ struct Vector2D
         return Vector2D<T>{ -x, -y };
     }
 
+    template <typename U = T>
+    constexpr Vector2D<int> to_grid(U tile_size) const noexcept
+    {
+        return Vector2D<int>{
+            static_cast<int>(x / tile_size) - (x < 0 ? 1 : 0),
+            static_cast<int>(y / tile_size) - (y < 0 ? 1 : 0)
+        };
+    }
+
     constexpr T dot( const Vector2D<T>& other ) const noexcept
     {
         return  x*other.x + y*other.y;

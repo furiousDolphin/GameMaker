@@ -28,6 +28,7 @@ class FontManager
         FontManager& operator=( FontManager&& ) = default;
 
         TTF_Font* get_font() { return font_.get(); }
+        const TTF_Font* get_font() const { return font_.get(); }
 
     private:
         std::shared_ptr<TTF_Font> font_;

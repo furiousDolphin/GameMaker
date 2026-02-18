@@ -9,7 +9,7 @@ GameMode::GameMode( SDL_Renderer* renderer, EventManager& event_manager, Graphic
 
 void GameMode::create_buttons()
 {
-    const auto& textures = context_.graphics_manager.get_texture("EDITOR", GraphicsManager::MINECRAFT_24);
+    const auto* textures = context_.graphics_manager.get_text_button_textures_ptr("EDITOR", GraphicsManager::MINECRAFT_24);
     buttons_.add(std::make_unique<TextButton>(Vector2D<int>(0, 0), [this](){context_.mode_type = ModeType::EDITOR;}, textures));
 }
 

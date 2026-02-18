@@ -12,6 +12,7 @@
 #include "EventManager.hpp"
 #include "Button.hpp"
 #include "CanvaTile.hpp"
+#include "EditorMenu.hpp"
 
 
 
@@ -27,7 +28,6 @@ class EditorMode : public Mode
     private:
         void create_buttons();
         void pan_input();
-        void update_grid_pos();
         void draw_grid() const;
 
         void update( float dt );
@@ -36,6 +36,7 @@ class EditorMode : public Mode
         Vector2D<int> origin_;
         Vector2D<int> mouse_origin_vector_;  
         Vector2D<int> grid_pos_;
+        int canva_id_;
 
         struct Context
         {
@@ -46,6 +47,9 @@ class EditorMode : public Mode
         } context_;
 
         Buttons buttons_;
+        EditorDataManager data_manager_;
+        EditorMenu menu_;
+        CanvaTiles canva_tiles_;
 };
 
 

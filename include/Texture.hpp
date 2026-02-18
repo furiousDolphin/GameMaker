@@ -27,12 +27,12 @@ class Texture
     public:
         Texture() = default;
 
-        explicit Texture( SDL_Renderer* renderer ): 
+        explicit Texture( const SDL_Renderer* renderer ): 
             renderer_{ renderer } 
         {}
 
 
-        Texture( SDL_Renderer* renderer, const std::string& path ): 
+        Texture( const SDL_Renderer* renderer, const std::string& path ): 
             renderer_{ renderer }
         {
             if( !load_file(path) ) 
@@ -40,7 +40,7 @@ class Texture
         }
 
 
-        Texture( SDL_Renderer* renderer, const std::string& text, SDL_Color color, TTF_Font* font ): 
+        Texture( const SDL_Renderer* renderer, const std::string& text, SDL_Color color, const TTF_Font* font ): 
             renderer_{ renderer }
         {
             if( !load_text(text, color, font) ) 
@@ -88,7 +88,7 @@ class Texture
                     rect.h = clip->h;
                 }
 
-                SDL_RenderCopyEx( renderer_, texture_.get(), clip, &rect, angle, center, flip );
+                SDL_RenderCopyEx( const_cast<SDL_Renderer*>(renderer_), texture_.get(), clip, &rect, angle, center, flip );
             }
         }
 
@@ -112,7 +112,7 @@ class Texture
     private:
         std::unique_ptr<SDL_Texture, SDLTextureDeleter> texture_;
 
-        SDL_Renderer* renderer_;
+        const SDL_Renderer* renderer_;
 
         int width_;
         int height_;
@@ -126,6 +126,7 @@ class Texture
                 throw std::invalid_argument( "nie wyszlo z base_path" );
             
             fs::path exe_path(base_path);
+            SDL_free(base_path);
             fs::path project_root = exe_path.parent_path().parent_path();
             fs::path file_path = project_root / path;
 
@@ -139,7 +140,7 @@ class Texture
 
             SDL_SetColorKey( surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 0xFF, 0xFF) );
 
-            texture_.reset(SDL_CreateTextureFromSurface(renderer_, surface));
+            texture_.reset(SDL_CreateTextureFromSurface(const_cast<SDL_Renderer*>(renderer_), surface));
 
             if ( texture_ == nullptr ) 
             {
@@ -155,9 +156,9 @@ class Texture
             return true;
         }
 
-        bool load_text(const std::string& text, SDL_Color color, TTF_Font* font) 
+        bool load_text(const std::string& text, SDL_Color color, const TTF_Font* font) 
         {
-            SDL_Surface* surface = TTF_RenderText_Solid(font, text.c_str(), color);
+            SDL_Surface* surface = TTF_RenderText_Solid(const_cast<TTF_Font*>(font), text.c_str(), color);
 
             if (!surface) 
             {
@@ -165,7 +166,7 @@ class Texture
                 return false;
             }
 
-            texture_.reset(SDL_CreateTextureFromSurface(renderer_, surface));
+            texture_.reset(SDL_CreateTextureFromSurface(const_cast<SDL_Renderer*>(renderer_), surface));
             if (!texture_) 
             {
                 SDL_Log( "SDL_CreateTextureFromSurface error: %s", SDL_GetError() );
