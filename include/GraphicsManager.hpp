@@ -21,6 +21,9 @@
 #include "Settings.hpp"
 
 
+template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+
 struct PairHash {
     template <class T1, class T2>
     std::size_t operator()(const std::pair<T1, T2>& p) const {
@@ -125,7 +128,7 @@ class GraphicsManager
         const TextButtonTextures* get_text_button_textures_ptr( const std::string& text, FontKey font_key) const;
         const Texture* get_dynamic_texture_ptr(const std::string& file_path) const;
 
-        using FoundItems = std::variant<const Texture*, const VectorizedTextures*, Animation>;
+        using FoundItems = std::variant<std::monostate, const Texture*, const VectorizedTextures*, Animation>;
 
         FoundItems find_items_by_path(const std::string& path) const;
 

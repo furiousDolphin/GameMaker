@@ -21,6 +21,24 @@ EditorDataManager::EditorDataManager(GraphicsManager& graphics_manager) :
     }
 }
 
+void EditorDataManager::update(float dt)
+{
+    for ( auto& [id, series] : data_ )
+    {
+        auto& graphics = series.graphics;
+        std::visit(overloaded{
+            [&](std::monostate)
+            {},
+            [&](const Texture* texture_ptr)
+            {},
+            [&](const GraphicsManager::VectorizedTextures* vec_textures_ptr)
+            {},
+            [&](Animation& animation)
+            {animation.update(dt);}
+        }, graphics);
+    }
+}
+
 bool EditorDataManager::is_object(int id) const
 { return object_ids_.contains(id); }
 bool EditorDataManager::is_tile(int id) const

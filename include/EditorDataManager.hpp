@@ -25,6 +25,7 @@ class EditorDataManager
         bool is_object(int id) const;
         bool is_tile(int id) const;
         const DataSeries& get_series(int id) const;
+        void update( float dt);
         
 
         using iterator = std::unordered_map<int, DataSeries>::iterator;

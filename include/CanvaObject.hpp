@@ -19,13 +19,17 @@ class CanvaObject
 {
     public:
         friend CanvaObjects;
-        CanvaObject( int id ); 
+        CanvaObject( Vector2D<int> pos, int id, const GraphicsManager::FoundItems* graphics ); 
 
     private:
-        Rect& get_rect();
-        void update( const Vector2D<int>& origin, const EventManager& event_manager );
-        void render( const Vector2D<int>& origin, const GraphicsManager& graphics_manager ) const;
+        void set_pos(Vector2D<int> new_pos);
+        Vector2D<int> get_pos();
+        const Rect& get_rect() const;
+        void update();
+        void render() const;
 
+        const GraphicsManager::FoundItems* graphics_;
+        Vector2D<int> pos_;
         Rect rect_;
         int id_;
 };
@@ -44,7 +48,7 @@ class CanvaObjects
         void render();
 
     private:
-        void add();
+        void add(Vector2D<int> pos, int id);
         void remove(std::vector<CanvaObject>::iterator it);
         void remove(std::vector<CanvaObject>::reverse_iterator rit);
 
@@ -78,7 +82,7 @@ class CanvaObjects
             {   
                 obj_ptr = new_obj_ptr; 
                 active=true;
-                offset = global_mouse_pos - new_obj_ptr->get_rect().get_pos();
+                offset = global_mouse_pos - new_obj_ptr->get_pos();
             }
         } grabbed_;
 

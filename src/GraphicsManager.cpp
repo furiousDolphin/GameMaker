@@ -21,10 +21,11 @@ GraphicsManager::GraphicsManager( SDL_Renderer* renderer ) :
         auto shared_textures = std::make_shared<std::vector<Texture>>();
 
         for ( const auto& path : paths )
-        { shared_textures->emplace_back(path); }
+        { shared_textures->emplace_back(renderer, path); }
 
-        animations_as_map_.emplace(key, Animation{shared_textures, 1, true}); 
+        animations_as_map_.emplace(key, Animation{shared_textures, 30, true}); 
     }
+
 
     for ( const auto& [folder_path, key] : vectorized_textures_as_path_key_map )
     { vectorized_textures_as_map_.emplace(key, VectorizedTextures{renderer, folder_path}); }
@@ -32,13 +33,16 @@ GraphicsManager::GraphicsManager( SDL_Renderer* renderer ) :
     for ( const auto& [file_path, key] : singular_textures_as_path_key_map )
     { textures_as_map_[key] = Texture{renderer, file_path}; }
 
+
     fonts_.emplace( FontKey::MINECRAFT_18, FontManager( "data/fonts/MinecraftBold-nMK1.otf", 18 ) );
     fonts_.emplace( FontKey::MINECRAFT_24, FontManager( "data/fonts/MinecraftBold-nMK1.otf", 24 ) );
-    fonts_.emplace( FontKey::MINECRAFT_36, FontManager( "data/fonts/MinecraftBold-nMK1.otf", 36 ) );    
+    fonts_.emplace( FontKey::MINECRAFT_36, FontManager( "data/fonts/MinecraftBold-nMK1.otf", 36 ) );   
 }
 
 Animation GraphicsManager::copy_animation( AnimationKey key ) const
-{ return animations_as_map_.at(key); }
+{ 
+    return animations_as_map_.at(key); 
+}
 
 const Texture& GraphicsManager::get_texture( SingularTextureKey key ) const
 { return textures_as_map_.at(key); }
@@ -100,7 +104,7 @@ GraphicsManager::FoundItems GraphicsManager::find_items_by_path(const std::strin
         const auto& animation = animations_as_map_.at(key);
         return animation.copy(); 
     }
-    throw std::runtime_error("std::variant nie dostal zadnego argumentu");
+    return std::monostate{};
 }
 
 GraphicsManager::VectorizedTextures::VectorizedTextures(SDL_Renderer* renderer, const std::string& folder_path)

@@ -2,21 +2,57 @@
 
 #include "CanvaObject.hpp"
 
-CanvaObject::CanvaObject( int id ): 
-    id_{id}
+CanvaObject::CanvaObject( Vector2D<int> pos, int id, const GraphicsManager::FoundItems* graphics ): 
+    pos_{pos},
+    id_{id},
+    graphics_{graphics}
 {}
 
-Rect& CanvaObject::get_rect()
+void CanvaObject::set_pos(Vector2D<int> new_pos)
+{ pos_ = new_pos; }
+Vector2D<int> CanvaObject::get_pos()
+{ return pos_; }
+const Rect& CanvaObject::get_rect() const
 { return rect_; }
 
-void CanvaObject::update( const Vector2D<int>& origin, const EventManager& event_manager )
+void CanvaObject::update()
 {
-
+    std::visit(overloaded{
+        [&](std::monostate)
+        {},
+        [&](const GraphicsManager::VectorizedTextures* vect_textures_ptr)
+        {
+            auto w = TILE_SIZE;
+            auto h = TILE_SIZE;            
+            rect_ = Rect{pos_.x - w/2, pos_.y - h/2, w, h};
+        },
+        [&](const Texture* texture_ptr)
+        {
+            auto w = texture_ptr->get_width();
+            auto h = texture_ptr->get_height();
+            rect_ = Rect{pos_.x - w/2, pos_.y - h/2, w, h};
+        },
+        [&](const Animation& animation)
+        {
+            const Texture* texture_ptr = animation.get_texture();
+            auto w = texture_ptr->get_width();
+            auto h = texture_ptr->get_height();
+            rect_ = Rect{pos_.x - w/2, pos_.y - h/2, w, h};
+        }
+    }, *graphics_);  
 }
-
-void CanvaObject::render( const Vector2D<int>& origin, const GraphicsManager& graphics_manager ) const
+void CanvaObject::render() const
 {
-
+    std::visit(overloaded{ 
+        [&](std::monostate)
+        {},
+        [&](const Texture* texture_ptr)
+        {texture_ptr->render(rect_.get_pos());},
+        [&](const GraphicsManager::VectorizedTextures* vec_textures_ptr)
+        {},
+        [&](const Animation& animation)
+        {animation.get_texture()->render(rect_.get_pos());}
+    }, *graphics_);
 }
 
 CanvaObjects::CanvaObjects(
@@ -31,8 +67,12 @@ CanvaObjects::CanvaObjects(
 
 }
 
-void CanvaObjects::add()
-{canva_objects_.emplace_back(context_.canva_id);}
+void CanvaObjects::add(Vector2D<int> pos, int id)
+{
+    const auto& editor_data_manager = context_.editor_data_manager;
+    const auto& graphics = editor_data_manager.get_series(id).graphics;
+    canva_objects_.emplace_back(pos, id, &graphics);
+}
 void CanvaObjects::remove(std::vector<CanvaObject>::iterator it)
 { 
     if (grabbed_.active && grabbed_.obj_ptr == &(*it)) 
@@ -53,15 +93,19 @@ void CanvaObjects::update()
     Vector2D<int> origin = context_.origin;
     Vector2D<int> mouse_pos = event_manager.mouse_pos();
     Vector2D<int> global_mouse_pos = mouse_pos-origin;
-    
+
+    for ( auto& canva_object : canva_objects_ )
+    { canva_object.update(); }
+
     if (grabbed_)
     {
         if ( event_manager.left_got_unclicked() )
         { grabbed_.clear(); }
         else if ( event_manager.left_is_clicked() && event_manager.mouse_motion() )
         {
-            Vector2D<int> new_rect_pos = global_mouse_pos - grabbed_.offset;
-            (*grabbed_).get_rect().set_pos(new_rect_pos);   
+            Vector2D<int> new_pos = global_mouse_pos - grabbed_.offset;
+
+            (*grabbed_).set_pos(new_pos);   
         }
     }
     else if ( editor_data_manager.is_object(canva_id) )
@@ -88,63 +132,12 @@ void CanvaObjects::update()
                 }
             }
             if ( event_manager.left_got_clicked() && !any_got_grabbed )
-            { this->add(); }
+            { this->add(global_mouse_pos, context_.canva_id); }
         }
     }
 }
 void CanvaObjects::render()
-{}
-
-// bool CanvaObjects::verify_canva_object_type( int id )
-// {
-//     const auto& style = editor_context_.editor_data.at( id ).style;
-//     bool success      = false;
-
-
-//     switch( canva_objects_type_ )
-//     {
-//         case CanvaObjectType::FOREGROUND:
-//             if( style == "palm_fg" ) success = true;
-//             break;
-//         case CanvaObjectType::BACKGROUND:
-//             if( style == "palm_bg" ) success = true;
-//             break;
-//         case CanvaObjectType::ENTITIES:
-//             if( style == "player" ) success = true;
-//             break;
-//         default:
-//             break;
-//     }
-
-//     return success;
-// }
-
-// void CanvaObjects::add( Vector2D<int> pos, int id )
-// {
-
-//     if( this->verify_canva_object_type( id ) )
-//     {
-//         const auto& origin    = editor_context_.origin;
-//         const auto& animation = editor_context_.editor_graphics.get_animation( id );
-//         const auto& texture   = animation.get_texture();
-
-//         auto w = texture->get_width();
-//         auto h = texture->get_height();
-            
-//         pos -= Vector2D<int>( w/2, h/2 );
-
-
-//         if( canva_objects_.find( pos ) == canva_objects_.end() )
-//         {
-//             canva_objects_.emplace( pos, CanvaObject{ { pos, w, h }, id } );
-//         }
-//     }
-// } 
-
-// void CanvaObjects::render()
-// {
-//     for( auto& [pos, canva_object] : canva_objects_ )
-//     {
-//         canva_object.render( editor_context_ );
-//     } 
-// }
+{
+    for ( const auto& canva_object : canva_objects_ )
+    { canva_object.render(); }
+}

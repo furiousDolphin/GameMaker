@@ -15,6 +15,7 @@ EditorMode::EditorMode( SDL_Renderer* renderer, EventManager& event_manager, Gra
     canva_tiles_{event_manager, graphics_manager, origin_, data_manager_, canva_id_},
     canva_objects_{event_manager, graphics_manager, origin_, data_manager_, canva_id_}
 {
+    canva_id_ = 2;
     this->create_buttons();
 }
 
@@ -56,6 +57,7 @@ void EditorMode::update( float dt )
 {
     this->pan_input();
     buttons_.update();
+    data_manager_.update(dt);
     if (!menu_.update())
     { 
         canva_tiles_.update();
@@ -74,6 +76,12 @@ void EditorMode::render()
     canva_objects_.render();
     buttons_.render();
     menu_.render();
+
+    const auto* prev_texture_ptr = data_manager_.get_series(canva_id_).preview_texture;
+    Vector2D<int> mouse_pos = context_.event_manager.mouse_pos();
+    int w = prev_texture_ptr->get_width();
+    int h = prev_texture_ptr->get_height();
+    prev_texture_ptr->render(mouse_pos.x - w/2, mouse_pos.y - h/2);
 
     SDL_RenderPresent( renderer );
 }
