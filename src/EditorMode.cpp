@@ -12,7 +12,8 @@ EditorMode::EditorMode( SDL_Renderer* renderer, EventManager& event_manager, Gra
     buttons_{event_manager, graphics_manager},
     data_manager_{graphics_manager},
     menu_{event_manager, graphics_manager, origin_, data_manager_, canva_id_},
-    canva_tiles_{event_manager, graphics_manager, origin_, data_manager_, canva_id_}
+    canva_tiles_{event_manager, graphics_manager, origin_, data_manager_, canva_id_},
+    canva_objects_{event_manager, graphics_manager, origin_, data_manager_, canva_id_}
 {
     this->create_buttons();
 }
@@ -56,7 +57,10 @@ void EditorMode::update( float dt )
     this->pan_input();
     buttons_.update();
     if (!menu_.update())
-    { canva_tiles_.update(); }
+    { 
+        canva_tiles_.update();
+        canva_objects_.update();
+    }
 }
 
 void EditorMode::render()
@@ -67,6 +71,7 @@ void EditorMode::render()
 
     this->draw_grid();
     canva_tiles_.render();
+    canva_objects_.render();
     buttons_.render();
     menu_.render();
 

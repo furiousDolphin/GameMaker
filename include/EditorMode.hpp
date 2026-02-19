@@ -12,6 +12,7 @@
 #include "EventManager.hpp"
 #include "Button.hpp"
 #include "CanvaTile.hpp"
+#include "CanvaObject.hpp"
 #include "EditorMenu.hpp"
 
 
@@ -50,6 +51,7 @@ class EditorMode : public Mode
         EditorDataManager data_manager_;
         EditorMenu menu_;
         CanvaTiles canva_tiles_;
+        CanvaObjects canva_objects_;
 };
 
 

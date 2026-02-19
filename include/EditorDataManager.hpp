@@ -22,6 +22,8 @@ class EditorDataManager
             GraphicsManager::FoundItems graphics;
         };
 
+        bool is_object(int id) const;
+        bool is_tile(int id) const;
         const DataSeries& get_series(int id) const;
         
 
@@ -46,6 +48,9 @@ class EditorDataManager
 
 
         std::unordered_map<int, DataSeries> data_;
+        std::set<int> object_ids_;
+        std::set<int> tile_ids_;
+
         static inline std::string data_path_ = "editor_data.json";
 
 };

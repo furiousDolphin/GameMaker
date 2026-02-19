@@ -11,7 +11,20 @@ EditorDataManager::EditorDataManager(GraphicsManager& graphics_manager) :
     context_{graphics_manager}
 {
     this->create_data();
+
+    for ( const auto& [id, series] : data_ )
+    {
+        if ( series.type == "object" )
+        { object_ids_.insert(id); }
+        if ( series.type == "tile" )
+        { tile_ids_.insert(id); }
+    }
 }
+
+bool EditorDataManager::is_object(int id) const
+{ return object_ids_.contains(id); }
+bool EditorDataManager::is_tile(int id) const
+{ return tile_ids_.contains(id); }
 
 const EditorDataManager::DataSeries& EditorDataManager::get_series(int id) const
 { return data_.at(id); }
