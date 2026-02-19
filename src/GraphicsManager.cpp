@@ -8,7 +8,25 @@ namespace fs = std::filesystem;
 GraphicsManager::GraphicsManager( SDL_Renderer* renderer ) :
     renderer_{renderer}
 {
-    for (const auto& [folder_path, key] : vectorized_textures_as_path_key_map)
+    for ( const auto& [folder_path, key] : animations_as_path_key_map )
+    { 
+        std::vector<std::string> paths;
+        for ( const auto& entry : fs::directory_iterator(folder_path) )
+        {
+            if ( entry.is_regular_file() && entry.path().extension() == ".png" )
+            { paths.emplace_back(entry.path().string()); }
+        }
+        std::sort(paths.begin(), paths.end());
+
+        auto shared_textures = std::make_shared<std::vector<Texture>>();
+
+        for ( const auto& path : paths )
+        { shared_textures->emplace_back(path); }
+
+        animations_as_map_.emplace(key, Animation{shared_textures, 1, true}); 
+    }
+
+    for ( const auto& [folder_path, key] : vectorized_textures_as_path_key_map )
     { vectorized_textures_as_map_.emplace(key, VectorizedTextures{renderer, folder_path}); }
 
     for ( const auto& [file_path, key] : singular_textures_as_path_key_map )
@@ -18,6 +36,9 @@ GraphicsManager::GraphicsManager( SDL_Renderer* renderer ) :
     fonts_.emplace( FontKey::MINECRAFT_24, FontManager( "data/fonts/MinecraftBold-nMK1.otf", 24 ) );
     fonts_.emplace( FontKey::MINECRAFT_36, FontManager( "data/fonts/MinecraftBold-nMK1.otf", 36 ) );    
 }
+
+Animation GraphicsManager::copy_animation( AnimationKey key ) const
+{ return animations_as_map_.at(key); }
 
 const Texture& GraphicsManager::get_texture( SingularTextureKey key ) const
 { return textures_as_map_.at(key); }
@@ -67,11 +88,19 @@ const Texture* GraphicsManager::get_dynamic_texture_ptr(const std::string& file_
 
 GraphicsManager::FoundItems GraphicsManager::find_items_by_path(const std::string& path) const
 {
-    //zastapic std::variant
-    return FoundItems{
-        this->get_ptr_by_path(path, singular_textures_as_path_key_map, textures_as_map_),
-        this->get_ptr_by_path(path, vectorized_textures_as_path_key_map, vectorized_textures_as_map_),
-    };
+    if ( const auto* tex = this->get_ptr_by_path(path, singular_textures_as_path_key_map, textures_as_map_) )
+    { return tex; }
+    if ( const auto* vec = this->get_ptr_by_path(path, vectorized_textures_as_path_key_map, vectorized_textures_as_map_) )
+    { return vec; }
+    
+    auto animation_it = animations_as_path_key_map.find(path);
+    if ( animation_it != animations_as_path_key_map.end() )
+    {
+        const auto& [_, key] = *animation_it;
+        const auto& animation = animations_as_map_.at(key);
+        return animation.copy(); 
+    }
+    throw std::runtime_error("std::variant nie dostal zadnego argumentu");
 }
 
 GraphicsManager::VectorizedTextures::VectorizedTextures(SDL_Renderer* renderer, const std::string& folder_path)
