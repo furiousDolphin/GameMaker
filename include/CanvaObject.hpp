@@ -20,10 +20,10 @@ class CanvaObject
     public:
         friend CanvaObjects;
         CanvaObject( Vector2D<int> pos, int id, const GraphicsManager::FoundItems* graphics ); 
+        Vector2D<int> get_pos() const;
 
     private:
         void set_pos(Vector2D<int> new_pos);
-        Vector2D<int> get_pos();
         const Rect& get_rect() const;
         void update();
         void render() const;
@@ -46,6 +46,15 @@ class CanvaObjects
 
         void update();
         void render();
+
+        using iterator = std::vector<CanvaObject>::iterator;
+        using const_iterator = std::vector<CanvaObject>::const_iterator;
+        iterator begin();
+        iterator end();
+        const_iterator begin() const;
+        const_iterator end() const;
+        const_iterator cbegin() const;
+        const_iterator cend() const;
 
     private:
         void add(Vector2D<int> pos, int id);

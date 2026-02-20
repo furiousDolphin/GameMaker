@@ -1,4 +1,5 @@
 
+#include <sstream>
 
 #include "CanvaObject.hpp"
 #include "CanvaTile.hpp"
@@ -189,3 +190,69 @@ void CanvaTiles::render() const
         canva_tile.render( pos, context_.graphics_manager ); 
     }    
 }
+
+CanvaTiles::ExportFormat CanvaTiles::export_data() const
+{
+    ExportFormat export_map;
+
+    // auto pomocnicza = [&](std::string key, std::string pos, std::variant<std::string, int> val)
+    // {
+    //     auto it = export_map.find(key);
+    //     if ( it != export_map.end() )
+    //     {
+    //         auto& [_, map] = *it;
+    //         std::visit(overloaded{
+    //             [&](std::string str_val )
+    //             {map.emplace(pos, str_val);},
+    //             [&](int int_val)
+    //             {map.emplace(pos, int_val);}
+    //         }, val);
+    //     }
+    //     else
+    //     {
+    //         std::visit(overloaded{
+    //             [&](std::string str_val )
+    //             { export_map[key] = {{pos, str_val}}; },
+    //             [&](int int_val)
+    //             { export_map[key] = {{pos, int_val}}; }
+    //         }, val);
+    //     }
+    // };
+
+    auto dopisz = [&](const std::string& seria, const std::string& pos, std::variant<int, std::string> val) 
+    { export_map[seria][pos] = val; };
+
+    for (const auto& [grid_pos, canva_tile] : canva_tiles_)
+    {
+        //std::string str_pos = std::to_string(grid_pos.x) + ";" + std::to_string(grid_pos.y);
+        std::string str_pos = std::format("{};{}", grid_pos.x, grid_pos.y);
+
+        if (canva_tile.has_land())
+        { dopisz("terrain", str_pos, canva_tile.land_index_); }
+        
+        if (canva_tile.has_water())
+        { dopisz("water", str_pos, "tile_water_01"); }
+    }
+    return export_map; 
+}
+
+CanvaTiles::iterator CanvaTiles::emplace(const Vector2D<int>& pos, CanvaTile canva_tile)
+{ return canva_tiles_.emplace(pos, std::move(canva_tile)).first; }
+
+CanvaTiles::iterator CanvaTiles::find(const Vector2D<int> grid_pos)
+{return canva_tiles_.find(grid_pos);}
+CanvaTiles::const_iterator CanvaTiles::find(const Vector2D<int> grid_pos) const
+{return canva_tiles_.find(grid_pos);}
+
+CanvaTiles::iterator CanvaTiles::begin()
+{return canva_tiles_.begin();}
+CanvaTiles::iterator CanvaTiles::end()
+{return canva_tiles_.end();}
+CanvaTiles::const_iterator CanvaTiles::begin() const
+{return canva_tiles_.cbegin();}
+CanvaTiles::const_iterator CanvaTiles::end() const
+{return canva_tiles_.cend();}
+CanvaTiles::const_iterator CanvaTiles::cbegin() const
+{return canva_tiles_.cbegin();}
+CanvaTiles::const_iterator CanvaTiles::cend() const
+{return canva_tiles_.cend();}

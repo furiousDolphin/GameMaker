@@ -53,6 +53,32 @@ void EditorMode::pan_input()
     { origin_ = mouse_pos - mouse_origin_vector_; }
 }
 
+void EditorMode::export_data()
+{
+    for ( const auto& canva_object : canva_objects_ )
+    {
+        Vector2D<int> pos = canva_object.get_pos();
+        Vector2D<int> grid_pos = pos.to_grid(TILE_SIZE);
+        Vector2D<int> offset = TILE_SIZE*grid_pos - pos;
+
+        auto it = canva_tiles_.find(grid_pos);
+        if ( it != canva_tiles_.end() )
+        {
+            auto& [_, canva_tile] = *it;
+            canva_tile.add_id(canva_id_, data_manager_, offset);
+        }
+        else
+        { canva_tiles_.emplace(grid_pos, CanvaTile(canva_id_, data_manager_, offset)); }
+    }  
+
+    
+}
+
+void EditorMode::import_data()
+{
+
+}
+
 void EditorMode::update( float dt )
 {
     this->pan_input();
@@ -92,7 +118,6 @@ void EditorMode::render()
     { prev_texture_ptr->render(TILE_SIZE*mouse_pos.to_grid(TILE_SIZE)); }
 
     //------------------------------------------------------------------------------------
-
 
     SDL_RenderPresent( renderer );
 }

@@ -30,6 +30,8 @@ class EditorMode : public Mode
         void create_buttons();
         void pan_input();
         void draw_grid() const;
+        void export_data();
+        void import_data();
 
         void update( float dt );
         void render();

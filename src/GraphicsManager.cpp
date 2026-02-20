@@ -40,9 +40,7 @@ GraphicsManager::GraphicsManager( SDL_Renderer* renderer ) :
 }
 
 Animation GraphicsManager::copy_animation( AnimationKey key ) const
-{ 
-    return animations_as_map_.at(key); 
-}
+{ return animations_as_map_.at(key); }
 
 const Texture& GraphicsManager::get_texture( SingularTextureKey key ) const
 { return textures_as_map_.at(key); }

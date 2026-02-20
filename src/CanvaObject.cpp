@@ -10,7 +10,7 @@ CanvaObject::CanvaObject( Vector2D<int> pos, int id, const GraphicsManager::Foun
 
 void CanvaObject::set_pos(Vector2D<int> new_pos)
 { pos_ = new_pos; }
-Vector2D<int> CanvaObject::get_pos()
+Vector2D<int> CanvaObject::get_pos() const
 { return pos_; }
 const Rect& CanvaObject::get_rect() const
 { return rect_; }
@@ -141,3 +141,16 @@ void CanvaObjects::render()
     for ( const auto& canva_object : canva_objects_ )
     { canva_object.render(); }
 }
+
+CanvaObjects::iterator CanvaObjects::begin()
+{return canva_objects_.begin();}
+CanvaObjects::iterator CanvaObjects::end()
+{return canva_objects_.end();}
+CanvaObjects::const_iterator CanvaObjects::begin() const
+{return canva_objects_.cbegin();}
+CanvaObjects::const_iterator CanvaObjects::end() const
+{return canva_objects_.cend();}
+CanvaObjects::const_iterator CanvaObjects::cbegin() const
+{return canva_objects_.cbegin();}
+CanvaObjects::const_iterator CanvaObjects::cend() const
+{return canva_objects_.cend();}
