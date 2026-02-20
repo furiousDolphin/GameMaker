@@ -1,13 +1,14 @@
 
 
-
+#include "CanvaObject.hpp"
 #include "CanvaTile.hpp"
 
 
-CanvaTile::CanvaTile( Vector2D<int> grid_pos ): 
-    grid_pos_  { grid_pos },
+CanvaTile::CanvaTile( int id, const EditorDataManager& editor_data_manager, Vector2D<int> object_offset ): 
     land_index_ {-1}
-{}
+{
+    this->add_id(id, editor_data_manager, object_offset );
+}
 
 bool CanvaTile::get_neighbours_flag() const
 { return neighbours_flag_; }
@@ -15,8 +16,11 @@ bool CanvaTile::get_neighbours_flag() const
 bool CanvaTile::has_land() const 
 { return land_index_ != -1; }
 
-void CanvaTile::add_id( int canva_id, const std::string& style )
+void CanvaTile::add_id( int canva_id, const EditorDataManager& editor_data_manager, Vector2D<int> object_offset )
 {
+    const auto& series = editor_data_manager.get_series(canva_id);
+    const auto& style = series.style;
+
     neighbours_flag_ = false;
 
     if( style == "terrain" && !this->has_land() ) 
@@ -24,11 +28,14 @@ void CanvaTile::add_id( int canva_id, const std::string& style )
         land_index_ = 0;
         neighbours_flag_ = true; 
     }
+    else
+    { objects_.emplace_back(object_offset, canva_id ); }   
 }
 
-void CanvaTile::remove_id( int canva_id, const std::string& style )
+void CanvaTile::remove_id( int canva_id, const EditorDataManager& editor_data_manager )
 {
-    neighbours_flag_ = false;
+    const auto& series = editor_data_manager.get_series(canva_id);
+    const auto& style = series.style;
 
     if( style == "terrain" && this->has_land() ) 
     { 
@@ -44,14 +51,12 @@ bool CanvaTile::any_id() const
 void CanvaTile::update()
 {}
 
-void CanvaTile::render( const Vector2D<int>& origin, const GraphicsManager& graphics_manager ) const
+void CanvaTile::render( Vector2D<int> pos, const GraphicsManager& graphics_manager ) const
 {
-    auto render_grid_pos = grid_pos_*TILE_SIZE + origin;
-
     if( this->has_land() ) 
     {
         const auto& land_textures = graphics_manager.get_vectorized_textures(GraphicsManager::LAND);
-        land_textures[land_index_].render( render_grid_pos );
+        land_textures[land_index_].render( pos );
     }
 }
 
@@ -70,18 +75,26 @@ CanvaTiles::CanvaTiles(
 
 void CanvaTiles::add_id() 
 { 
+    const auto& editor_data_manager = context_.editor_data_manager;
     Vector2D<int> mouse_pos = context_.event_manager.mouse_pos();
     Vector2D<int> mouse_grid_pos = (mouse_pos - context_.origin).to_grid(TILE_SIZE);
-
-    if( canva_tiles_.find( mouse_grid_pos ) == canva_tiles_.end() )
-    { canva_tiles_.insert_or_assign(mouse_grid_pos, CanvaTile(mouse_grid_pos)); } 
-
-    auto& canva_tile = canva_tiles_.at( mouse_grid_pos );
     int id = context_.canva_id;
-    const auto& style = context_.editor_data_manager.get_series(id).style;
 
-    canva_tile.add_id( id, style );
-            
+    auto pomocnicza = [&]()
+    {
+        auto it = canva_tiles_.find( mouse_grid_pos );
+        if ( it == canva_tiles_.end() )
+        { return canva_tiles_.emplace(mouse_grid_pos, CanvaTile(id, editor_data_manager)).first; }
+        else
+        { 
+            it->second.add_id(id, editor_data_manager);
+            return it;
+        }
+    };
+
+    auto it = pomocnicza();
+    const auto& [grid_pos, canva_tile] = *it;
+
     if( canva_tile.get_neighbours_flag() ) 
     { this->check_neighbours(); }
 }
@@ -96,15 +109,13 @@ void CanvaTiles::remove_id()
     {
         auto& [grid_pos, canva_tile] = *it;
 
-        int id = context_.canva_id;
-        const auto& style = context_.editor_data_manager.get_series(id).style;
-        canva_tile.remove_id(id, style);
-
-        if( !canva_tile.any_id() )
-        { canva_tiles_.erase( mouse_grid_pos ); }
+        canva_tile.remove_id(context_.canva_id, context_.editor_data_manager);
 
         if( canva_tile.get_neighbours_flag() ) 
         { this->check_neighbours(); }
+
+        if( !canva_tile.any_id() )
+        { canva_tiles_.erase(it); }
     } 
 }
 
@@ -173,5 +184,8 @@ void CanvaTiles::update()
 void CanvaTiles::render() const
 {
     for( const auto& [ grid_pos, canva_tile ] : canva_tiles_ )
-    { canva_tile.render( context_.origin, context_.graphics_manager ); }    
+    { 
+        auto pos = grid_pos*TILE_SIZE + context_.origin;
+        canva_tile.render( pos, context_.graphics_manager ); 
+    }    
 }

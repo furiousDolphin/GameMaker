@@ -24,19 +24,18 @@ class CanvaTile
     public:
         friend CanvaTiles;
 
-        CanvaTile( Vector2D<int> grid_pos );
+        CanvaTile( int id, const EditorDataManager& editor_data_manager, Vector2D<int> object_offset = {0, 0});
 
     private:
         bool get_neighbours_flag() const;
         bool has_land() const;
         bool has_water() const;
         bool any_id() const;
-        void add_id(int canva_id, const std::string& style);
-        void remove_id(int canva_id, const std::string& style);
+        void add_id(int canva_id, const EditorDataManager& editor_data_manager, Vector2D<int> object_offset = {0, 0});
+        void remove_id(int canva_id, const EditorDataManager& editor_data_manager);
         void update();
-        void render( const Vector2D<int>& origin, const GraphicsManager& graphics_manager ) const;
+        void render( Vector2D<int> pos, const GraphicsManager& graphics_manager ) const;
 
-        Vector2D<int> grid_pos_;
         int  land_index_;
         bool neighbours_flag_;
 

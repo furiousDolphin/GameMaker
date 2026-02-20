@@ -77,11 +77,22 @@ void EditorMode::render()
     buttons_.render();
     menu_.render();
 
+    //------------------------------------------------------------------------------------
+
     const auto* prev_texture_ptr = data_manager_.get_series(canva_id_).preview_texture;
     Vector2D<int> mouse_pos = context_.event_manager.mouse_pos();
-    int w = prev_texture_ptr->get_width();
-    int h = prev_texture_ptr->get_height();
-    prev_texture_ptr->render(mouse_pos.x - w/2, mouse_pos.y - h/2);
+
+    if (data_manager_.is_object(canva_id_))
+    {
+        int w = prev_texture_ptr->get_width();
+        int h = prev_texture_ptr->get_height();
+        prev_texture_ptr->render(mouse_pos.x - w/2, mouse_pos.y - h/2);
+    }
+    else if ( data_manager_.is_tile(canva_id_) )  
+    { prev_texture_ptr->render(TILE_SIZE*mouse_pos.to_grid(TILE_SIZE)); }
+
+    //------------------------------------------------------------------------------------
+
 
     SDL_RenderPresent( renderer );
 }
