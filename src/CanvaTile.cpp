@@ -191,7 +191,7 @@ void CanvaTiles::render() const
     }    
 }
 
-CanvaTiles::ExportFormat CanvaTiles::export_data() const
+ExportFormat CanvaTiles::export_data() const
 {
     ExportFormat export_map;
 
@@ -230,10 +230,49 @@ CanvaTiles::ExportFormat CanvaTiles::export_data() const
         if (canva_tile.has_land())
         { dopisz("terrain", str_pos, canva_tile.land_index_); }
         
-        if (canva_tile.has_water())
-        { dopisz("water", str_pos, "tile_water_01"); }
+        // if (canva_tile.has_water())
+        // { dopisz("water", str_pos, "tile_water_01"); }
     }
     return export_map; 
+}
+
+void CanvaTiles::import_data(const ExportFormat& data)
+{
+    auto str_to_vec2 = [](const std::string& str_vec)
+    {
+        std::size_t sep = str_vec.find(';');
+        if ( sep == std::string::npos )
+        { return Vector2D<int>{0, 0}; }
+
+        try
+        {
+            int x = std::stoi(str_vec.substr(0, sep));
+            int y = std::stoi(str_vec.substr(sep+1));
+            return Vector2D<int>{x, y};
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+            return Vector2D<int>{0, 0};
+        }
+    };
+
+    for ( const auto& [series_key, tiles] : data )
+    {
+        for ( const auto& [pos_key, val] : tiles )
+        { 
+            Vector2D<int> grid_pos = str_to_vec2(pos_key);
+            if ( series_key == "terrain" )
+            {
+                std::visit( overloaded{
+                    [&](int idx)
+                    { canva_tiles_[grid_pos].land_index_ = idx; },
+                    [](auto&&)
+                    {}
+                }, val);
+            }
+        } 
+    }
 }
 
 CanvaTiles::iterator CanvaTiles::emplace(const Vector2D<int>& pos, CanvaTile canva_tile)

@@ -23,6 +23,7 @@ class CanvaTile
 {
     public:
         friend CanvaTiles;
+        CanvaTile() = default;
         CanvaTile( int id, const EditorDataManager& editor_data_manager, Vector2D<int> object_offset = {0, 0});
         void add_id(int canva_id, const EditorDataManager& editor_data_manager, Vector2D<int> object_offset = {0, 0});
 
@@ -51,10 +52,9 @@ class CanvaTiles
             Vector2D<int>& origin, 
             EditorDataManager& editor_data_manager,
             int& canva_id );
-        
-        using ExportFormat = std::unordered_map<std::string, std::unordered_map<std::string, std::variant<int, std::string>>>;
 
         ExportFormat export_data() const;
+        void import_data(const ExportFormat& data);
         
         void update();
         void render() const;

@@ -71,11 +71,52 @@ void EditorMode::export_data()
         { canva_tiles_.emplace(grid_pos, CanvaTile(canva_id_, data_manager_, offset)); }
     }  
 
+    ExportFormat export_map = canva_tiles_.export_data();
+    std::string file_name = "map.json";
     
+    using json = nlohmann::json;
+
+    json j;
+    for ( const auto& [series_key, tiles] : export_map)
+    {
+        for ( const auto& [pos_key, val] : tiles )
+        {
+            std::visit(
+                [&](auto&& arg)
+                {j[series_key][pos_key] = arg;}, 
+                val);  
+        }
+    }
+
+    std::ofstream file{file_name};
+    if (file.is_open())
+    {file<<j.dump(4);}
 }
 
 void EditorMode::import_data()
 {
+    std::string file_name = "map.json";
+    std::ifstream file{file_name};
+    if ( !file.is_open() )
+    { throw std::runtime_error("nie udalo sie otworzyc map.json"); }
+
+    ExportFormat imported_data;
+
+    using json = nlohmann::json;
+    json j;
+
+    file >> j;
+
+    for ( auto& [series_key, tiles] : j.items() )
+    {
+        for ( auto& [pos_key, val] : tiles.items() )
+        {
+            if ( val.is_number_integer() )
+            { imported_data[series_key][pos_key] = val.get<int>(); }
+            else if ( val.is_string() )
+            { imported_data[series_key][pos_key] = val.get<std::string>(); }
+        }
+    }
 
 }
 
@@ -89,6 +130,9 @@ void EditorMode::update( float dt )
         canva_tiles_.update();
         canva_objects_.update();
     }
+
+    if (context_.event_manager.key_down(SDL_SCANCODE_S))
+    { this->export_data(); }
 }
 
 void EditorMode::render()

@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <variant>
 
 #include "Vector2D.hpp"
 #include "Texture.hpp"
@@ -45,5 +46,7 @@ namespace std
 }
 
 /*-------------------------------------------------------------------------------*/
+
+using ExportFormat = std::unordered_map<std::string, std::unordered_map<std::string, std::variant<int, std::string>>>;
 
 #endif
