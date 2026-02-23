@@ -1,7 +1,15 @@
+
+#include <nlohmann/json.hpp>
+#include <fstream>
+#include <stdexcept>
+
+#include <filesystem>
+namespace fs = std::filesystem;
+
 #include "GameMode.hpp"
 
-GameMode::GameMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, ModeType& mode_type ) :
-    context_{renderer, event_manager, graphics_manager, mode_type},
+GameMode::GameMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, PersistentState& persistent_state ) :
+    context_{renderer, event_manager, graphics_manager, persistent_state},
     buttons_{event_manager, graphics_manager}
 {
     this->create_buttons();
@@ -9,8 +17,24 @@ GameMode::GameMode( SDL_Renderer* renderer, EventManager& event_manager, Graphic
 
 void GameMode::create_buttons()
 {
-    const auto* textures = context_.graphics_manager.get_text_button_textures_ptr("EDITOR", GraphicsManager::MINECRAFT_24);
-    buttons_.add(std::make_unique<TextButton>(Vector2D<int>(0, 0), [this](){context_.mode_type = ModeType::EDITOR;}, textures));
+    const auto* main_menu_textures = context_.graphics_manager.get_text_button_textures_ptr("MAIN MENU", GraphicsManager::MINECRAFT_24);
+    auto main_menu_button_func = [this]()
+    {context_.persistent_state.mode = ModeType::MAIN_MENU;};
+    buttons_.add(std::make_unique<TextButton>(Vector2D<int>(0, 0), main_menu_button_func, main_menu_textures));
+}
+
+void GameMode::import_data()
+{
+    std::string file_name = context_.persistent_state.level;
+    std::ifstream file{file_name};
+    if ( !file.is_open() )
+    { throw std::runtime_error("nie udalo sie otworzyc map.json"); }
+
+    using json = nlohmann::json;
+    json j;
+    ExportFormat imported_data;
+
+    file >> j;
 }
 
 void GameMode::update()

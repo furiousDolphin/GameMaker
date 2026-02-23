@@ -21,8 +21,8 @@
 
 /*-------------------------------------------------------------------------------*/
 
-inline constexpr int WIDTH     = 960;
-inline constexpr int HEIGHT    = 540;
+inline constexpr int WIDTH = 960;
+inline constexpr int HEIGHT = 540;
 inline constexpr int TILE_SIZE = 64;
 
 /*-------------------------------------------------------------------------------*/
@@ -30,7 +30,8 @@ inline constexpr int TILE_SIZE = 64;
 enum class ModeType 
 { 
     GAME, 
-    EDITOR 
+    EDITOR,
+    MAIN_MENU
 };
 
 namespace std 
@@ -48,5 +49,6 @@ namespace std
 /*-------------------------------------------------------------------------------*/
 
 using ExportFormat = std::unordered_map<std::string, std::unordered_map<std::string, std::variant<int, std::string>>>;
+
 
 #endif

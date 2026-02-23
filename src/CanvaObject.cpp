@@ -85,6 +85,51 @@ void CanvaObjects::remove(std::vector<CanvaObject>::reverse_iterator rit)
     this->remove(normal_it);
 }
 
+void CanvaObjects::import_data(const ExportFormat& data)
+{
+    auto str_to_vec2 = [](const std::string& str_vec)
+    {
+        std::size_t sep = str_vec.find(';');
+        if ( sep == std::string::npos )
+        { return Vector2D<int>{0, 0}; }
+
+        try
+        {
+            int x = std::stoi(str_vec.substr(0, sep));
+            int y = std::stoi(str_vec.substr(sep+1));
+            return Vector2D<int>{x, y};
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+            return Vector2D<int>{0, 0};
+        }
+    };
+
+    // for ( const auto& [series_key, tiles] : data )
+    // {
+    //     for ( const auto& [pos_key, val] : tiles )
+    //     { 
+    //         Vector2D<int> grid_pos = str_to_vec2(pos_key);
+    //         if ( series_key == "terrain" )
+    //         {
+    //             std::visit( overloaded{
+    //                 [&](int idx)
+    //                 { canva_tiles_[grid_pos].land_index_ = idx; },
+    //                 [](auto&&)
+    //                 {}
+    //             }, val);
+    //         }
+    //     } 
+    // }
+}
+
+void CanvaObjects::clear()
+{
+    grabbed_.clear();
+    canva_objects_.clear();
+}
+
 void CanvaObjects::update()
 {   
     const auto& event_manager = context_.event_manager;

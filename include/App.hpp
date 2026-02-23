@@ -16,6 +16,7 @@
 #include "GraphicsManager.hpp"
 #include "SDL_Management.hpp"
 #include "Mode.hpp"
+#include "PersistentState.hpp"
 
 
 
@@ -38,7 +39,8 @@ class App
         SDL_Renderer*   renderer_;
         EventManager    event_manager_;
         GraphicsManager graphics_manager_;
-        ModeType        mode_type_;
+
+        PersistentState persistent_state_;
 
         Uint32 last_time_;
         Uint32 current_time_;

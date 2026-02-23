@@ -55,7 +55,8 @@ class CanvaTiles
 
         ExportFormat export_data() const;
         void import_data(const ExportFormat& data);
-        
+        void clear(); 
+
         void update();
         void render() const;
 

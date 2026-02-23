@@ -1,5 +1,5 @@
-#ifndef GAMEMODE_HPP_
-#define GAMEMODE_HPP_
+#ifndef MAINMENUMODE_HPP_
+#define MAINMENUMODE_HPP_
 
 #include <SDL.h>
 #include <SDL_mixer.h>
@@ -7,28 +7,27 @@
 #include <SDL_image.h>
 
 
-#include "Mode.hpp"
 #include "Settings.hpp"
-#include "Button.hpp"
+#include "Mode.hpp"
 #include "EventManager.hpp"
-#include "GraphicsManager.hpp"
+#include "Button.hpp"
 #include "PersistentState.hpp"
 
 
 
 
-class GameMode : public Mode
+class MainMenuMode : public Mode
 {
     public:
-        GameMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, PersistentState& persistent_state );
+        MainMenuMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, PersistentState& persistent_state );
 
         void run( float dt ) override;
 
     private:
-        void update();
-        void render();
         void create_buttons();
-        void import_data();
+
+        void update( float dt );
+        void render();
 
         struct Context
         {
@@ -40,5 +39,6 @@ class GameMode : public Mode
 
         Buttons buttons_;
 };
+
 
 #endif

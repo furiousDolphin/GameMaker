@@ -14,7 +14,7 @@
 #include "CanvaTile.hpp"
 #include "CanvaObject.hpp"
 #include "EditorMenu.hpp"
-
+#include "PersistentState.hpp"
 
 
 
@@ -22,7 +22,7 @@
 class EditorMode : public Mode
 {
     public:
-        EditorMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, ModeType& mode_type );
+        EditorMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, PersistentState& persistent_state );
 
         void run( float dt ) override;
 
@@ -46,7 +46,7 @@ class EditorMode : public Mode
             SDL_Renderer* renderer;
             EventManager& event_manager;
             GraphicsManager& graphics_manager;
-            ModeType& mode_type;
+            PersistentState& persistent_state;
         } context_;
 
         Buttons buttons_;

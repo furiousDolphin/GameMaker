@@ -7,8 +7,8 @@ namespace fs = std::filesystem;
 
 #include "EditorMode.hpp"
 
-EditorMode::EditorMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, ModeType& mode_type ):
-    context_{renderer, event_manager, graphics_manager, mode_type},
+EditorMode::EditorMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, PersistentState& persistent_state ):
+    context_{renderer, event_manager, graphics_manager, persistent_state},
     buttons_{event_manager, graphics_manager},
     data_manager_{graphics_manager},
     menu_{event_manager, graphics_manager, origin_, data_manager_, canva_id_},
@@ -21,8 +21,10 @@ EditorMode::EditorMode( SDL_Renderer* renderer, EventManager& event_manager, Gra
 
 void EditorMode::create_buttons()
 {
-    const auto* textures = context_.graphics_manager.get_text_button_textures_ptr("GAME", GraphicsManager::MINECRAFT_24);
-    buttons_.add(std::make_unique<TextButton>(Vector2D<int>(0, 0), [this](){context_.mode_type = ModeType::GAME;}, textures));
+    const auto* main_menu_textures = context_.graphics_manager.get_text_button_textures_ptr("MAIN MENU", GraphicsManager::MINECRAFT_24);
+    auto main_menu_func = [this]()
+    { context_.persistent_state.mode = ModeType::MAIN_MENU; this->export_data(); };
+    buttons_.add(std::make_unique<TextButton>(Vector2D<int>(0, 0), main_menu_func, main_menu_textures));
 }
 
 void EditorMode::draw_grid() const
@@ -91,19 +93,21 @@ void EditorMode::export_data()
     std::ofstream file{file_name};
     if (file.is_open())
     {file<<j.dump(4);}
+
+    canva_tiles_.clear();
+    canva_objects_.clear();
 }
 
 void EditorMode::import_data()
 {
-    std::string file_name = "map.json";
+    std::string file_name = context_.persistent_state.level;
     std::ifstream file{file_name};
     if ( !file.is_open() )
     { throw std::runtime_error("nie udalo sie otworzyc map.json"); }
 
-    ExportFormat imported_data;
-
     using json = nlohmann::json;
     json j;
+    ExportFormat imported_data;
 
     file >> j;
 
@@ -118,10 +122,22 @@ void EditorMode::import_data()
         }
     }
 
+
+    canva_tiles_.clear();
+    canva_tiles_.import_data(imported_data);
+    canva_objects_.clear();
+    canva_objects_.import_data(imported_data);
 }
 
 void EditorMode::update( float dt )
 {
+    auto& request_editor_reload = context_.persistent_state.request_editor_reload;
+    if (request_editor_reload)
+    {
+        request_editor_reload = false;
+        this->import_data();
+    }
+
     this->pan_input();
     buttons_.update();
     data_manager_.update(dt);

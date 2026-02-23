@@ -44,6 +44,8 @@ class CanvaObjects
             EditorDataManager& editor_data_manager,
             int& canva_id);
 
+        void import_data(const ExportFormat& data);     
+        void clear();   
         void update();
         void render();
 

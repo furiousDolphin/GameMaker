@@ -275,6 +275,9 @@ void CanvaTiles::import_data(const ExportFormat& data)
     }
 }
 
+void CanvaTiles::clear()
+{ canva_tiles_.clear();}
+
 CanvaTiles::iterator CanvaTiles::emplace(const Vector2D<int>& pos, CanvaTile canva_tile)
 { return canva_tiles_.emplace(pos, std::move(canva_tile)).first; }
 
