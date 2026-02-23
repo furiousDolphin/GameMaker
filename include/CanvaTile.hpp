@@ -15,6 +15,7 @@
 #include "EventManager.hpp"
 #include "GraphicsManager.hpp"
 #include "EditorDataManager.hpp"
+#include "JsonLevelFormat.hpp"
 
 
 
@@ -53,8 +54,8 @@ class CanvaTiles
             EditorDataManager& editor_data_manager,
             int& canva_id );
 
-        ExportFormat export_data() const;
-        void import_data(const ExportFormat& data);
+        void export_data(JsonLevelFormat& json_level_format_data) const;
+        void import_data(const JsonLevelFormat& json_level_format_data);
         void clear(); 
 
         void update();

@@ -15,6 +15,7 @@
 
 #include "Vector2D.hpp"
 #include "Texture.hpp"
+#include "Rect.hpp" 
 #include "SDL_Management.hpp"
 
 
@@ -24,6 +25,7 @@
 inline constexpr int WIDTH = 960;
 inline constexpr int HEIGHT = 540;
 inline constexpr int TILE_SIZE = 64;
+inline constexpr double SQRT2 = 1.414213562373095;
 
 /*-------------------------------------------------------------------------------*/
 
@@ -46,9 +48,19 @@ namespace std
     };
 }
 
+struct PairHash {
+    template <class T1, class T2>
+    std::size_t operator()(const std::pair<T1, T2>& p) const {
+        auto h1 = std::hash<T1>{}(p.first);
+        auto h2 = std::hash<T2>{}(p.second);
+        return h1 ^ (h2 << 1); 
+    }
+};
+
 /*-------------------------------------------------------------------------------*/
 
-using ExportFormat = std::unordered_map<std::string, std::unordered_map<std::string, std::variant<int, std::string>>>;
+template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
+template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 
 #endif

@@ -13,6 +13,7 @@ class PersistentState
         ModeType mode;
         std::string level;
         bool request_editor_reload;
+        bool request_game_reload;
         std::vector<std::string> levels;
         //tu powinny byc tez sciezki wszelkiej masci
     private:

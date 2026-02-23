@@ -5,6 +5,8 @@
 #include <filesystem>
 namespace fs = std::filesystem;
 
+#include "JsonLevelFormat.hpp"
+
 #include "EditorMode.hpp"
 
 EditorMode::EditorMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, PersistentState& persistent_state ):
@@ -23,7 +25,10 @@ void EditorMode::create_buttons()
 {
     const auto* main_menu_textures = context_.graphics_manager.get_text_button_textures_ptr("MAIN MENU", GraphicsManager::MINECRAFT_24);
     auto main_menu_func = [this]()
-    { context_.persistent_state.mode = ModeType::MAIN_MENU; this->export_data(); };
+    { 
+        context_.persistent_state.mode = ModeType::MAIN_MENU; 
+        this->export_data(); 
+    };
     buttons_.add(std::make_unique<TextButton>(Vector2D<int>(0, 0), main_menu_func, main_menu_textures));
 }
 
@@ -73,60 +78,21 @@ void EditorMode::export_data()
         { canva_tiles_.emplace(grid_pos, CanvaTile(canva_id_, data_manager_, offset)); }
     }  
 
-    ExportFormat export_map = canva_tiles_.export_data();
-    std::string file_name = "map.json";
-    
-    using json = nlohmann::json;
-
-    json j;
-    for ( const auto& [series_key, tiles] : export_map)
-    {
-        for ( const auto& [pos_key, val] : tiles )
-        {
-            std::visit(
-                [&](auto&& arg)
-                {j[series_key][pos_key] = arg;}, 
-                val);  
-        }
-    }
-
-    std::ofstream file{file_name};
-    if (file.is_open())
-    {file<<j.dump(4);}
+    JsonLevelFormat json_level_format_data{context_.persistent_state.level};
+    canva_tiles_.export_data(json_level_format_data);
+    json_level_format_data.export_to_json();
 
     canva_tiles_.clear();
-    canva_objects_.clear();
+    canva_objects_.clear();    
 }
 
 void EditorMode::import_data()
 {
-    std::string file_name = context_.persistent_state.level;
-    std::ifstream file{file_name};
-    if ( !file.is_open() )
-    { throw std::runtime_error("nie udalo sie otworzyc map.json"); }
+    JsonLevelFormat json_level_format_data{context_.persistent_state.level};
+    json_level_format_data.import_from_json();
 
-    using json = nlohmann::json;
-    json j;
-    ExportFormat imported_data;
-
-    file >> j;
-
-    for ( auto& [series_key, tiles] : j.items() )
-    {
-        for ( auto& [pos_key, val] : tiles.items() )
-        {
-            if ( val.is_number_integer() )
-            { imported_data[series_key][pos_key] = val.get<int>(); }
-            else if ( val.is_string() )
-            { imported_data[series_key][pos_key] = val.get<std::string>(); }
-        }
-    }
-
-
-    canva_tiles_.clear();
-    canva_tiles_.import_data(imported_data);
-    canva_objects_.clear();
-    canva_objects_.import_data(imported_data);
+    canva_tiles_.import_data(json_level_format_data);
+    canva_objects_.import_data(json_level_format_data);
 }
 
 void EditorMode::update( float dt )
@@ -139,9 +105,8 @@ void EditorMode::update( float dt )
     }
 
     this->pan_input();
-    buttons_.update();
     data_manager_.update(dt);
-    if (!menu_.update())
+    if (!menu_.update() && !buttons_.update())
     { 
         canva_tiles_.update();
         canva_objects_.update();
@@ -175,7 +140,7 @@ void EditorMode::render()
         prev_texture_ptr->render(mouse_pos.x - w/2, mouse_pos.y - h/2);
     }
     else if ( data_manager_.is_tile(canva_id_) )  
-    { prev_texture_ptr->render(TILE_SIZE*mouse_pos.to_grid(TILE_SIZE)); }
+    { prev_texture_ptr->render(TILE_SIZE*(mouse_pos - origin_).to_grid(TILE_SIZE) + origin_); }
 
     //------------------------------------------------------------------------------------
 

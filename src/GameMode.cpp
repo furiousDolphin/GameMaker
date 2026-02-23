@@ -10,7 +10,8 @@ namespace fs = std::filesystem;
 
 GameMode::GameMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, PersistentState& persistent_state ) :
     context_{renderer, event_manager, graphics_manager, persistent_state},
-    buttons_{event_manager, graphics_manager}
+    buttons_{event_manager, graphics_manager},
+    land_{graphics_manager, origin_}
 {
     this->create_buttons();
 }
@@ -25,20 +26,23 @@ void GameMode::create_buttons()
 
 void GameMode::import_data()
 {
-    std::string file_name = context_.persistent_state.level;
-    std::ifstream file{file_name};
-    if ( !file.is_open() )
-    { throw std::runtime_error("nie udalo sie otworzyc map.json"); }
+    JsonLevelFormat json_level_format_data{context_.persistent_state.level};
+    json_level_format_data.import_from_json();
 
-    using json = nlohmann::json;
-    json j;
-    ExportFormat imported_data;
-
-    file >> j;
+    std::cout << "import data game" << "\n";
+    land_.load_level(json_level_format_data);
 }
 
 void GameMode::update()
 {
+    auto& request_game_reload = context_.persistent_state.request_game_reload;
+    if (request_game_reload)
+    {
+        request_game_reload = false;
+        this->import_data();
+    }
+
+    land_.update();
     buttons_.update();
 }
 
@@ -48,6 +52,7 @@ void GameMode::render()
     SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0xff );
     SDL_RenderClear( renderer );
 
+    land_.render();
     buttons_.render();
     SDL_RenderPresent( renderer );
 }

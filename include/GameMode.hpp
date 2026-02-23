@@ -13,6 +13,7 @@
 #include "EventManager.hpp"
 #include "GraphicsManager.hpp"
 #include "PersistentState.hpp"
+#include "Land.hpp"
 
 
 
@@ -30,6 +31,8 @@ class GameMode : public Mode
         void create_buttons();
         void import_data();
 
+        Vector2D<int> origin_;
+
         struct Context
         {
             SDL_Renderer* renderer;
@@ -39,6 +42,7 @@ class GameMode : public Mode
         } context_;
 
         Buttons buttons_;
+        Land land_;
 };
 
 #endif

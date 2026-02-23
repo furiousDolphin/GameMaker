@@ -13,6 +13,7 @@
 #include "EventManager.hpp"
 #include "GraphicsManager.hpp"
 #include "EditorDataManager.hpp"
+#include "JsonLevelFormat.hpp"
 
 class CanvaObjects;
 class CanvaObject
@@ -44,7 +45,7 @@ class CanvaObjects
             EditorDataManager& editor_data_manager,
             int& canva_id);
 
-        void import_data(const ExportFormat& data);     
+        void import_data(const JsonLevelFormat& json_level_format_data);     
         void clear();   
         void update();
         void render();

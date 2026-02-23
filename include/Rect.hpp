@@ -113,6 +113,16 @@ class Rect
             rect_.y = v.y;
         }
 
+        inline int get_right() const { return rect_.x + rect_.w; }
+        inline int get_left() const { return rect_.x; }
+        inline int get_top() const { return rect_.y; }
+        inline int get_bottom() const { return rect_.y + rect_.h; }
+
+        inline void set_right(int x) { rect_.x = x - rect_.w; }
+        inline void set_left(int x) { rect_.x = x; }
+        inline void set_top(int y) { rect_.y = y; }
+        inline void set_bottom(int y) { rect_.y = y - rect_.h; }
+
         inline constexpr int get_x() const { return rect_.x; }
         inline constexpr int get_y() const { return rect_.y; }
         inline constexpr int get_w() const { return rect_.w; }

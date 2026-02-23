@@ -191,85 +191,31 @@ void CanvaTiles::render() const
     }    
 }
 
-ExportFormat CanvaTiles::export_data() const
+void CanvaTiles::export_data(JsonLevelFormat& json_level_format_data) const
 {
-    ExportFormat export_map;
-
-    // auto pomocnicza = [&](std::string key, std::string pos, std::variant<std::string, int> val)
-    // {
-    //     auto it = export_map.find(key);
-    //     if ( it != export_map.end() )
-    //     {
-    //         auto& [_, map] = *it;
-    //         std::visit(overloaded{
-    //             [&](std::string str_val )
-    //             {map.emplace(pos, str_val);},
-    //             [&](int int_val)
-    //             {map.emplace(pos, int_val);}
-    //         }, val);
-    //     }
-    //     else
-    //     {
-    //         std::visit(overloaded{
-    //             [&](std::string str_val )
-    //             { export_map[key] = {{pos, str_val}}; },
-    //             [&](int int_val)
-    //             { export_map[key] = {{pos, int_val}}; }
-    //         }, val);
-    //     }
-    // };
-
-    auto dopisz = [&](const std::string& seria, const std::string& pos, std::variant<int, std::string> val) 
-    { export_map[seria][pos] = val; };
-
     for (const auto& [grid_pos, canva_tile] : canva_tiles_)
     {
-        //std::string str_pos = std::to_string(grid_pos.x) + ";" + std::to_string(grid_pos.y);
-        std::string str_pos = std::format("{};{}", grid_pos.x, grid_pos.y);
-
         if (canva_tile.has_land())
-        { dopisz("terrain", str_pos, canva_tile.land_index_); }
-        
-        // if (canva_tile.has_water())
-        // { dopisz("water", str_pos, "tile_water_01"); }
+        { json_level_format_data.add_to_export(JsonLevelFormat::TERRAIN, grid_pos, canva_tile.land_index_); }        
     }
-    return export_map; 
 }
 
-void CanvaTiles::import_data(const ExportFormat& data)
+void CanvaTiles::import_data(const JsonLevelFormat& json_level_format_data)
 {
-    auto str_to_vec2 = [](const std::string& str_vec)
+    canva_tiles_.clear();
+    const auto& data = json_level_format_data.get_import_data();
+    for ( const auto& [enum_series_key, tiles] : data )
     {
-        std::size_t sep = str_vec.find(';');
-        if ( sep == std::string::npos )
-        { return Vector2D<int>{0, 0}; }
-
-        try
-        {
-            int x = std::stoi(str_vec.substr(0, sep));
-            int y = std::stoi(str_vec.substr(sep+1));
-            return Vector2D<int>{x, y};
-        }
-        catch(const std::exception& e)
-        {
-            std::cerr << e.what() << '\n';
-            return Vector2D<int>{0, 0};
-        }
-    };
-
-    for ( const auto& [series_key, tiles] : data )
-    {
-        for ( const auto& [pos_key, val] : tiles )
+        for ( const auto& [vec2_pos, val] : tiles )
         { 
-            Vector2D<int> grid_pos = str_to_vec2(pos_key);
-            if ( series_key == "terrain" )
+            switch( enum_series_key )
             {
-                std::visit( overloaded{
-                    [&](int idx)
-                    { canva_tiles_[grid_pos].land_index_ = idx; },
-                    [](auto&&)
-                    {}
-                }, val);
+                case JsonLevelFormat::TERRAIN:
+                    if ( auto* idx_ptr = std::get_if<int>(&val) )
+                    { canva_tiles_[vec2_pos].land_index_ = *idx_ptr; }
+                    break;
+                default:
+                    break;                    
             }
         } 
     }
