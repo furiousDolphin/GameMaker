@@ -10,6 +10,7 @@
 class Animation
 {
     public:
+        Animation() = default;
         Animation( std::shared_ptr<std::vector<Texture>> textures, int texture_duration, bool loop = false );
    
         

@@ -76,7 +76,8 @@ add_executable(GameMakerApp
   src/CanvaObject.cpp
   src/Animation.cpp
   src/PersistentState.cpp
-  src/MainMenuMode.cpp )
+  src/MainMenuMode.cpp
+  src/Entity.cpp )
 target_link_libraries(GameMakerApp PRIVATE base_module_library)
 
 set_target_properties(GameMakerApp PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE")
