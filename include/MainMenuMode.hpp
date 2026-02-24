@@ -19,14 +19,19 @@
 class MainMenuMode : public Mode
 {
     public:
-        MainMenuMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, PersistentState& persistent_state );
+        MainMenuMode( 
+            SDL_Renderer* renderer, 
+            EventManager& event_manager, 
+            GraphicsManager& graphics_manager, 
+            PersistentState& persistent_state,
+            float& dt  );
 
-        void run( float dt ) override;
+        void run() override;
 
     private:
         void create_buttons();
 
-        void update( float dt );
+        void update();
         void render();
 
         struct Context
@@ -35,6 +40,7 @@ class MainMenuMode : public Mode
             EventManager& event_manager;
             GraphicsManager& graphics_manager;
             PersistentState& persistent_state;
+            float& dt;
         } context_;
 
         Buttons buttons_;

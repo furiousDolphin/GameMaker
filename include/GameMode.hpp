@@ -14,6 +14,7 @@
 #include "GraphicsManager.hpp"
 #include "PersistentState.hpp"
 #include "Land.hpp"
+#include "Entity.hpp"
 
 
 
@@ -21,9 +22,9 @@
 class GameMode : public Mode
 {
     public:
-        GameMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, PersistentState& persistent_state );
+        GameMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, PersistentState& persistent_state, float& dt );
 
-        void run( float dt ) override;
+        void run() override;
 
     private:
         void update();
@@ -32,6 +33,7 @@ class GameMode : public Mode
         void import_data();
 
         Vector2D<int> origin_;
+        Vector2D<double> render_scroll_;
 
         struct Context
         {
@@ -39,10 +41,12 @@ class GameMode : public Mode
             EventManager& event_manager;
             GraphicsManager& graphics_manager;
             PersistentState& persistent_state;
+            float& dt;
         } context_;
 
         Buttons buttons_;
         Land land_;
+        Entities entities_;
 };
 
 #endif

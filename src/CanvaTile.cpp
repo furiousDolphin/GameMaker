@@ -5,10 +5,10 @@
 #include "CanvaTile.hpp"
 
 
-CanvaTile::CanvaTile( int id, const EditorDataManager& editor_data_manager, Vector2D<int> object_offset ): 
+CanvaTile::CanvaTile( int id, const EditorDataManager& editor_data_manager ): 
     land_index_ {-1}
 {
-    this->add_id(id, editor_data_manager, object_offset );
+    this->add_id(id, editor_data_manager);
 }
 
 bool CanvaTile::get_neighbours_flag() const
@@ -17,7 +17,7 @@ bool CanvaTile::get_neighbours_flag() const
 bool CanvaTile::has_land() const 
 { return land_index_ != -1; }
 
-void CanvaTile::add_id( int canva_id, const EditorDataManager& editor_data_manager, Vector2D<int> object_offset )
+void CanvaTile::add_id( int canva_id, const EditorDataManager& editor_data_manager)
 {
     const auto& series = editor_data_manager.get_series(canva_id);
     const auto& style = series.style;
@@ -28,9 +28,7 @@ void CanvaTile::add_id( int canva_id, const EditorDataManager& editor_data_manag
     { 
         land_index_ = 0;
         neighbours_flag_ = true; 
-    }
-    else
-    { objects_.emplace_back(object_offset, canva_id ); }   
+    }  
 }
 
 void CanvaTile::remove_id( int canva_id, const EditorDataManager& editor_data_manager )
@@ -196,13 +194,13 @@ void CanvaTiles::export_data(JsonLevelFormat& json_level_format_data) const
     for (const auto& [grid_pos, canva_tile] : canva_tiles_)
     {
         if (canva_tile.has_land())
-        { json_level_format_data.add_to_export(JsonLevelFormat::TERRAIN, grid_pos, canva_tile.land_index_); }        
+        { json_level_format_data.add_to_export(JsonLevelFormat::TERRAIN, grid_pos, canva_tile.land_index_); }    
     }
 }
 
 void CanvaTiles::import_data(const JsonLevelFormat& json_level_format_data)
 {
-    canva_tiles_.clear();
+    this->clear();
     const auto& data = json_level_format_data.get_import_data();
     for ( const auto& [enum_series_key, tiles] : data )
     {

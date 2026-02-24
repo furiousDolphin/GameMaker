@@ -27,7 +27,7 @@ class CanvaObject
         void set_pos(Vector2D<int> new_pos);
         const Rect& get_rect() const;
         void update();
-        void render() const;
+        void render(Vector2D<int> origin) const;
 
         const GraphicsManager::FoundItems* graphics_;
         Vector2D<int> pos_;
@@ -45,6 +45,7 @@ class CanvaObjects
             EditorDataManager& editor_data_manager,
             int& canva_id);
 
+        void export_data(JsonLevelFormat& json_level_format_data) const;
         void import_data(const JsonLevelFormat& json_level_format_data);     
         void clear();   
         void update();

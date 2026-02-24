@@ -22,9 +22,9 @@
 class EditorMode : public Mode
 {
     public:
-        EditorMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, PersistentState& persistent_state );
+        EditorMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, PersistentState& persistent_state, float& dt );
 
-        void run( float dt ) override;
+        void run() override;
 
     private:
         void create_buttons();
@@ -33,7 +33,7 @@ class EditorMode : public Mode
         void export_data();
         void import_data();
 
-        void update( float dt );
+        void update();
         void render();
 
         Vector2D<int> origin_;
@@ -47,6 +47,7 @@ class EditorMode : public Mode
             EventManager& event_manager;
             GraphicsManager& graphics_manager;
             PersistentState& persistent_state;
+            float& dt;
         } context_;
 
         Buttons buttons_;

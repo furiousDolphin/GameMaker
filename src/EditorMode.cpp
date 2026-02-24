@@ -9,8 +9,14 @@ namespace fs = std::filesystem;
 
 #include "EditorMode.hpp"
 
-EditorMode::EditorMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, PersistentState& persistent_state ):
-    context_{renderer, event_manager, graphics_manager, persistent_state},
+EditorMode::EditorMode( 
+    SDL_Renderer* renderer, 
+    EventManager& event_manager, 
+    GraphicsManager& graphics_manager, 
+    PersistentState& persistent_state, 
+    float& dt 
+):
+    context_{renderer, event_manager, graphics_manager, persistent_state, dt},
     buttons_{event_manager, graphics_manager},
     data_manager_{graphics_manager},
     menu_{event_manager, graphics_manager, origin_, data_manager_, canva_id_},
@@ -62,24 +68,9 @@ void EditorMode::pan_input()
 
 void EditorMode::export_data()
 {
-    for ( const auto& canva_object : canva_objects_ )
-    {
-        Vector2D<int> pos = canva_object.get_pos();
-        Vector2D<int> grid_pos = pos.to_grid(TILE_SIZE);
-        Vector2D<int> offset = TILE_SIZE*grid_pos - pos;
-
-        auto it = canva_tiles_.find(grid_pos);
-        if ( it != canva_tiles_.end() )
-        {
-            auto& [_, canva_tile] = *it;
-            canva_tile.add_id(canva_id_, data_manager_, offset);
-        }
-        else
-        { canva_tiles_.emplace(grid_pos, CanvaTile(canva_id_, data_manager_, offset)); }
-    }  
-
     JsonLevelFormat json_level_format_data{context_.persistent_state.level};
     canva_tiles_.export_data(json_level_format_data);
+    canva_objects_.export_data(json_level_format_data);
     json_level_format_data.export_to_json();
 
     canva_tiles_.clear();
@@ -95,7 +86,7 @@ void EditorMode::import_data()
     canva_objects_.import_data(json_level_format_data);
 }
 
-void EditorMode::update( float dt )
+void EditorMode::update()
 {
     auto& request_editor_reload = context_.persistent_state.request_editor_reload;
     if (request_editor_reload)
@@ -105,7 +96,7 @@ void EditorMode::update( float dt )
     }
 
     this->pan_input();
-    data_manager_.update(dt);
+    data_manager_.update(context_.dt);
     if (!menu_.update() && !buttons_.update())
     { 
         canva_tiles_.update();
@@ -147,9 +138,9 @@ void EditorMode::render()
     SDL_RenderPresent( renderer );
 }
 
-void EditorMode::run( float dt )
+void EditorMode::run()
 {
-    this->update( dt );
+    this->update();
     this->render();
 }
 

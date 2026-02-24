@@ -9,7 +9,7 @@ Land::Land(const GraphicsManager& graphics_manager, const Vector2D<int>& origin)
 }
 
 std::vector<Vector2D<int>> Land::get_physical_tiles_around(
-    Vector2D<int> entity_pos,
+    Vector2D<double> entity_pos,
     const std::vector<Vector2D<int>>& entity_neighbour_offsets ) const
 {
     std::vector<Vector2D<int>> res;

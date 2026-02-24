@@ -3,8 +3,14 @@
 #include "MainMenuMode.hpp"
 
 
-MainMenuMode::MainMenuMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, PersistentState& persistent_state ) :
-    context_{renderer, event_manager, graphics_manager, persistent_state},
+MainMenuMode::MainMenuMode( 
+    SDL_Renderer* renderer, 
+    EventManager& event_manager, 
+    GraphicsManager& graphics_manager, 
+    PersistentState& persistent_state,
+    float& dt 
+) :
+    context_{renderer, event_manager, graphics_manager, persistent_state, dt},
     buttons_{event_manager, graphics_manager}
 {
     this->create_buttons();
@@ -30,7 +36,7 @@ void MainMenuMode::create_buttons()
     buttons_.add(std::make_unique<TextButton>(Vector2D<int>(0, 40), editor_button_func, editor_button_textures));
 }
 
-void MainMenuMode::update( float dt )
+void MainMenuMode::update()
 { buttons_.update(); }
 
 void MainMenuMode::render()
@@ -44,9 +50,9 @@ void MainMenuMode::render()
     SDL_RenderPresent( renderer );
 }
 
-void MainMenuMode::run( float dt )
+void MainMenuMode::run()
 {
-    this->update( dt );
+    this->update();
     this->render();
 }
 

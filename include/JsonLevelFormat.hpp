@@ -12,6 +12,8 @@ class JsonLevelFormat
         enum Key
         {
             TERRAIN,
+            ENTITIES,
+            PLAYER
         };
 
         using DataFormat = std::unordered_map<Key, std::unordered_map<Vector2D<int>, std::variant<Vector2D<int>, int>>>;
@@ -23,7 +25,9 @@ class JsonLevelFormat
     private:
         static inline std::unordered_map<std::string, Key> string_key_map_
         {
-            {"terrain", TERRAIN}
+            {"terrain", TERRAIN},
+            {"entities", ENTITIES}
+
         };
         std::unordered_map<Key, std::string> key_string_map_;
 

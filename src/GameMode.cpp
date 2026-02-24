@@ -8,10 +8,17 @@ namespace fs = std::filesystem;
 
 #include "GameMode.hpp"
 
-GameMode::GameMode( SDL_Renderer* renderer, EventManager& event_manager, GraphicsManager& graphics_manager, PersistentState& persistent_state ) :
-    context_{renderer, event_manager, graphics_manager, persistent_state},
+GameMode::GameMode( 
+    SDL_Renderer* renderer, 
+    EventManager& event_manager, 
+    GraphicsManager& graphics_manager, 
+    PersistentState& persistent_state, 
+    float& dt 
+) :
+    context_{renderer, event_manager, graphics_manager, persistent_state, dt},
     buttons_{event_manager, graphics_manager},
-    land_{graphics_manager, origin_}
+    land_{graphics_manager, origin_},
+    entities_{graphics_manager, event_manager, land_, dt, origin_}
 {
     this->create_buttons();
 }
@@ -31,6 +38,7 @@ void GameMode::import_data()
 
     std::cout << "import data game" << "\n";
     land_.load_level(json_level_format_data);
+    entities_.load_level(json_level_format_data);
 }
 
 void GameMode::update()
@@ -44,6 +52,14 @@ void GameMode::update()
 
     land_.update();
     buttons_.update();
+    entities_.update();
+
+    
+
+
+    // self.render_scroll[0] += (self.player.rect().centerx - self.surf.get_width()/2 - self.render_scroll[0]) / 30
+    // self.render_scroll[1] += (self.player.rect().centery - self.surf.get_height()/2 - self.render_scroll[1]) / 30
+    // self.offset = (int(self.render_scroll[0]), int(self.render_scroll[1]))
 }
 
 void GameMode::render()
@@ -54,10 +70,12 @@ void GameMode::render()
 
     land_.render();
     buttons_.render();
+    entities_.render();
+    
     SDL_RenderPresent( renderer );
 }
 
-void GameMode::run( float dt )
+void GameMode::run()
 {
     this->update();
     this->render();

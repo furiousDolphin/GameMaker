@@ -14,7 +14,7 @@ class Land
         
         void load_level(const JsonLevelFormat& json_level_format_data);
         std::vector<Vector2D<int>> get_physical_tiles_around(
-            Vector2D<int> entity_pos, 
+            Vector2D<double> entity_pos, 
             const std::vector<Vector2D<int>>& entity_neighbour_offsets ) const;
 
         void update();

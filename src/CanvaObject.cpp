@@ -41,17 +41,17 @@ void CanvaObject::update()
         }
     }, *graphics_);  
 }
-void CanvaObject::render() const
+void CanvaObject::render(Vector2D<int> origin) const
 {
     std::visit(overloaded{ 
         [&](std::monostate)
         {},
         [&](const Texture* texture_ptr)
-        {texture_ptr->render(rect_.get_pos());},
+        {texture_ptr->render(rect_.get_pos() + origin);},
         [&](const GraphicsManager::VectorizedTextures* vec_textures_ptr)
         {},
         [&](const Animation& animation)
-        {animation.get_texture()->render(rect_.get_pos());}
+        {animation.get_texture()->render(rect_.get_pos() + origin);}
     }, *graphics_);
 }
 
@@ -75,9 +75,12 @@ void CanvaObjects::add(Vector2D<int> pos, int id)
 }
 void CanvaObjects::remove(std::vector<CanvaObject>::iterator it)
 { 
-    if (grabbed_.active && grabbed_.obj_ptr == &(*it)) 
-    { grabbed_.clear(); }
-    canva_objects_.erase(it);
+    if ( context_.editor_data_manager.get_series(it->id_).style != "player" )
+    {
+        if (grabbed_.active && grabbed_.obj_ptr == &(*it)) 
+        { grabbed_.clear(); }
+        canva_objects_.erase(it);
+    }
 }
 void CanvaObjects::remove(std::vector<CanvaObject>::reverse_iterator rit)
 {
@@ -85,8 +88,48 @@ void CanvaObjects::remove(std::vector<CanvaObject>::reverse_iterator rit)
     this->remove(normal_it);
 }
 
+void CanvaObjects::export_data(JsonLevelFormat& json_level_format_data) const
+{
+    for (const auto& canva_object : canva_objects_)
+    {
+        int id = canva_object.id_;
+        const auto& style = context_.editor_data_manager.get_series(id).style;
+        if ( style == "player" )
+        { json_level_format_data.add_to_export(JsonLevelFormat::ENTITIES, canva_object.pos_, id); }
+    }    
+}
+
 void CanvaObjects::import_data(const JsonLevelFormat& json_level_format_data)
-{}
+{
+    this->clear();
+
+    int player_id = 0;   //!!!!!!!!!!!!!!!!  poprawic to bo bedzie mnie to straszylo w nocy
+    bool is_player = false;
+
+    const auto& data = json_level_format_data.get_import_data();
+    for ( const auto& [enum_series_key, objects] : data )
+    {
+        for ( const auto& [vec2_pos, val] : objects )
+        { 
+            switch( enum_series_key )
+            {
+                case JsonLevelFormat::ENTITIES:
+                    if ( auto* id_ptr = std::get_if<int>(&val) )
+                    { 
+                        this->add(vec2_pos, *id_ptr);
+                        if ( *id_ptr == player_id )
+                        {is_player = true;} 
+                    }
+                    break;
+                default:
+                    break;                    
+            }
+        } 
+    } 
+    
+    if ( !is_player )
+    { this->add({0, 0}, player_id); }
+}
 
 void CanvaObjects::clear()
 {
@@ -148,7 +191,7 @@ void CanvaObjects::update()
 void CanvaObjects::render()
 {
     for ( const auto& canva_object : canva_objects_ )
-    { canva_object.render(); }
+    { canva_object.render(context_.origin); }
 }
 
 CanvaObjects::iterator CanvaObjects::begin()

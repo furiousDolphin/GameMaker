@@ -25,8 +25,8 @@ class CanvaTile
     public:
         friend CanvaTiles;
         CanvaTile() = default;
-        CanvaTile( int id, const EditorDataManager& editor_data_manager, Vector2D<int> object_offset = {0, 0});
-        void add_id(int canva_id, const EditorDataManager& editor_data_manager, Vector2D<int> object_offset = {0, 0});
+        CanvaTile( int id, const EditorDataManager& editor_data_manager);
+        void add_id(int canva_id, const EditorDataManager& editor_data_manager);
 
     private:
         bool get_neighbours_flag() const;
@@ -39,9 +39,7 @@ class CanvaTile
 
         int land_index_;
         bool has_water_;
-        bool neighbours_flag_;
-
-        std::vector< std::pair< Vector2D<int>, int > > objects_;       
+        bool neighbours_flag_;      
 };
 
 class CanvaTiles

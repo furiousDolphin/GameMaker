@@ -14,7 +14,7 @@
 class Mode
 {
     public:        
-        virtual void run( float dt ) = 0;
+        virtual void run() = 0;
 };
 
 #endif
