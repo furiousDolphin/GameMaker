@@ -47,6 +47,7 @@ class GameMode : public Mode
         Buttons buttons_;
         Land land_;
         Entities entities_;
+        std::unique_ptr<Player> player_;
 };
 
 #endif

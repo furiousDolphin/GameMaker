@@ -95,7 +95,7 @@ void CanvaObjects::export_data(JsonLevelFormat& json_level_format_data) const
         int id = canva_object.id_;
         const auto& style = context_.editor_data_manager.get_series(id).style;
         if ( style == "player" )
-        { json_level_format_data.add_to_export(JsonLevelFormat::ENTITIES, canva_object.pos_, id); }
+        { json_level_format_data.add_to_export(JsonLevelFormat::PLAYER, canva_object.pos_, id); }
     }    
 }
 
@@ -113,7 +113,7 @@ void CanvaObjects::import_data(const JsonLevelFormat& json_level_format_data)
         { 
             switch( enum_series_key )
             {
-                case JsonLevelFormat::ENTITIES:
+                case JsonLevelFormat::PLAYER:
                     if ( auto* id_ptr = std::get_if<int>(&val) )
                     { 
                         this->add(vec2_pos, *id_ptr);

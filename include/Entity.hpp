@@ -13,7 +13,7 @@
 class Entity
 {
     public:
-        Entity(Vector2D<double> pos, Animation animation);
+        Entity(Vector2D<double> centre, Vector2D<int> shape);
         virtual void update(const GraphicsManager& graphics_manager, const EventManager& event_manager, const Land& land, float dt) = 0;
         virtual void render(Vector2D<int> origin) const = 0;
     protected:
@@ -30,8 +30,8 @@ class Entity
         } collisions_;
 
         std::vector<Vector2D<int>> neighbour_offsets_;
-        std::pair<int, int> neighbour_area_shape_;
         Vector2D<double> pos_;
+        Vector2D<int> shape_;
         Animation animation_;
 
 };
@@ -40,15 +40,21 @@ class Entity
 class Player : public Entity
 {
     public: 
-        Player(Vector2D<double> pos, const GraphicsManager& graphics_manager);
+        Player(Vector2D<double> centre);
         void update(const GraphicsManager& graphics_manager, const EventManager& event_manager, const Land& land, float dt) override;
         void render(Vector2D<int> origin) const override;
+        Vector2D<double> get_center() const;
     private:
-        static inline double speed_ = 100.0;
+
+        bool set_action_;
+        bool in_the_air_;
+
+        static inline double speed_ = 200.0;
         
         Vector2D<double> velocity_;
-        static inline double delta_velocity_y_ = 1.0;
-        static inline double max_velocity_y_ = 200.0;
+        static inline double gravity_ = 1100.0;
+        static inline double max_velocity_y_ = 800.0;
+        static inline double jump_velocity_ = -550.0;
 };
 
 

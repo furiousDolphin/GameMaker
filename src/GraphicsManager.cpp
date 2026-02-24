@@ -23,7 +23,7 @@ GraphicsManager::GraphicsManager( SDL_Renderer* renderer ) :
         for ( const auto& path : paths )
         { shared_textures->emplace_back(renderer, path); }
 
-        animations_as_map_.emplace(key, Animation{shared_textures, 30, true}); 
+        animations_as_map_.emplace(key, Animation{shared_textures, 5, true}); 
     }
 
 

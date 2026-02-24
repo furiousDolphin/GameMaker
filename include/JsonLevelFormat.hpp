@@ -26,7 +26,8 @@ class JsonLevelFormat
         static inline std::unordered_map<std::string, Key> string_key_map_
         {
             {"terrain", TERRAIN},
-            {"entities", ENTITIES}
+            {"entities", ENTITIES},
+            {"player", PLAYER}
 
         };
         std::unordered_map<Key, std::string> key_string_map_;

@@ -2,45 +2,39 @@
 #include "Entity.hpp"
 
 
-Entity::Entity(Vector2D<double> pos, Animation animation) :
-    pos_{pos},
-    animation_{std::move(animation)}
+Entity::Entity(Vector2D<double> centre, Vector2D<int> shape) :
+    pos_{centre-static_cast<Vector2D<double>>(shape)/2.0},
+    shape_{shape}
 {
-    // const auto* texture = animation.get_texture();
-    // int w = texture->get_width();
-    // int h = texture->get_height();
-
-    int w = TILE_SIZE;
-    int h = TILE_SIZE;
+    std::cout << "doszlo do playera" << "\n";
+    auto [w, h] = shape;
 
     int tiles_w = static_cast<int>(std::ceil(static_cast<float>(w) / TILE_SIZE));
     int tiles_h = static_cast<int>(std::ceil(static_cast<float>(h) / TILE_SIZE));
     
-    int range_x = (tiles_w / 2) + 1;
-    int range_y = (tiles_h / 2) + 1;
+    int range_x = (tiles_w / 2) + 2;
+    int range_y = (tiles_h / 2) + 2;
 
     for (int col = -range_x; col <= range_x; col++)
     {
         for (int row = -range_y; row <= range_y; row++)
         { neighbour_offsets_.emplace_back(row, col); }
     }
-
-    neighbour_area_shape_ = std::pair<int, int>((2 * range_y) + 1, (2 * range_x) + 1);
+    std::cout << "skonczylo playera" << "\n";
 }
+
+Vector2D<double> Player::get_center() const
+{ return pos_ + static_cast<Vector2D<double>>(shape_)/2.0; }
 
 Rect Entity::get_rect() const
 {
-    const auto* texture = animation_.get_texture();
-    int w = texture->get_width();
-    int h = texture->get_height();
-
     Vector2D<int> int_pos
     { 
         static_cast<int>(std::round(pos_.x)), 
         static_cast<int>(std::round(pos_.y)) 
     };
 
-    return Rect{int_pos, w, h};
+    return Rect{int_pos, shape_.x, shape_.y};
 }
 
 void Entity::Collisions::reset()
@@ -51,18 +45,29 @@ void Entity::Collisions::reset()
     left = false;
 }
 
-Player::Player(Vector2D<double> pos, const GraphicsManager& graphics_manager) :
-    Entity{pos, graphics_manager.copy_animation(GraphicsManager::PLAYER_IDLE_RIGHT)},
-    velocity_{0.0, 0.0}
+Player::Player(Vector2D<double> centre) :
+    Entity{centre, {32, 64}},
+    velocity_{0.0, 0.0},
+    set_action_{true},
+    in_the_air_{true}
 {}
 
 void Player::update(const GraphicsManager& graphics_manager, const EventManager& event_manager, const Land& land, float dt)
 {
+    //-------------------------------------------------------------------------------
+    if (set_action_)
+    {   
+        set_action_ = false; 
+        animation_ = graphics_manager.copy_animation(GraphicsManager::PLAYER_IDLE_RIGHT);
+    }
     animation_.update(dt);
 
     Vector2D<double> movement_frame{};
     if ( event_manager.key_down(SDL_SCANCODE_W) )
-    { velocity_.y = -300.0; }
+    { 
+        if ( !in_the_air_)
+        { velocity_.y = jump_velocity_; } 
+    }
 
     if ( event_manager.key_down(SDL_SCANCODE_A) )
     { movement_frame.x -= speed_*dt; }
@@ -70,15 +75,13 @@ void Player::update(const GraphicsManager& graphics_manager, const EventManager&
     { movement_frame.x += speed_*dt; }
 
     movement_frame+=velocity_*dt;
-
-
-
-
+    //-------------------------------------------------------------------------------
 
     collisions_.reset();
     std::vector<Vector2D<int>> physical_tiles_around;
     Rect rect;
 
+    //-------------------------------------------------------------------------------
     
     physical_tiles_around = land.get_physical_tiles_around(pos_, neighbour_offsets_);
 
@@ -102,8 +105,10 @@ void Player::update(const GraphicsManager& graphics_manager, const EventManager&
             }
         }
     }
-    pos_.x = static_cast<double>(rect.get_left());
+    if (collisions_.right || collisions_.left)
+    { pos_.x = static_cast<double>(rect.get_left()); }
 
+    //-------------------------------------------------------------------------------
 
     physical_tiles_around = land.get_physical_tiles_around(pos_, neighbour_offsets_);
 
@@ -127,21 +132,28 @@ void Player::update(const GraphicsManager& graphics_manager, const EventManager&
             }
         }
     }
-    pos_.y = static_cast<double>(rect.get_top());
     if (collisions_.top || collisions_.bot)
-    { velocity_.y = 0.0; }
+    { 
+        pos_.y = static_cast<double>(rect.get_top());
+        velocity_.y = 0.0; 
+    }
+    else
+    { velocity_.y = std::min(velocity_.y+gravity_*dt, max_velocity_y_ ); }//./build/GameMakerApp.exe 
 
-    velocity_.y = std::min(velocity_.y+delta_velocity_y_, max_velocity_y_ ); //./build/GameMakerApp.exe
+    if (collisions_.bot)
+    { in_the_air_ = false; }
+    else
+    { in_the_air_ = true; }
 
-    if (collisions_.bot || collisions_.top) 
-    { velocity_.y = 0; }
-
+    //-------------------------------------------------------------------------------
 }
 
 void Player::render(Vector2D<int> origin) const
 {
     const auto* texture = animation_.get_texture();
-    texture->render(static_cast<Vector2D<int>>(pos_) - origin);
+    int w = texture->get_width();
+    int h = texture->get_height();
+    texture->render(static_cast<Vector2D<int>>(pos_) - Vector2D<int>{w/2 - shape_.x/2, 0} - origin);
 }
 
 Entities::Entities(
@@ -158,21 +170,21 @@ Entities::Entities(
   
 void Entities::load_level(const JsonLevelFormat& json_level_format_data)
 {
-    const auto& imported_data = json_level_format_data.get_import_data();
-    auto it = imported_data.find(JsonLevelFormat::ENTITIES);
+    // const auto& imported_data = json_level_format_data.get_import_data();
+    // auto it = imported_data.find(JsonLevelFormat::ENTITIES);
 
-    entities_.clear();
-    if ( it != imported_data.end() )
-    {
-        for ( const auto& [vec2_pos, idx] : it->second)
-        { 
-            if ( auto* idx_ptr = std::get_if<int>(&idx) )
-            {
-                if ( *idx_ptr == 0 )
-                { this->add(std::make_unique<Player>(static_cast<Vector2D<double>>(vec2_pos), context_.graphics_manager)); }
-            } 
-        }
-    }
+    // entities_.clear();
+    // if ( it != imported_data.end() )
+    // {
+    //     for ( const auto& [vec2_pos, idx] : it->second)
+    //     { 
+    //         if ( auto* idx_ptr = std::get_if<int>(&idx) )
+    //         {
+    //             if ( *idx_ptr == 0 )
+    //             { this->add(std::make_unique<Player>(static_cast<Vector2D<double>>(vec2_pos))); }
+    //         } 
+    //     }
+    // }
 }
 
 void Entities::add(std::unique_ptr<Entity> entity_ptr)
