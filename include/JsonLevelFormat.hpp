@@ -13,7 +13,8 @@ class JsonLevelFormat
         {
             TERRAIN,
             ENTITIES,
-            PLAYER
+            PLAYER,
+            WATER
         };
 
         using DataFormat = std::unordered_map<Key, std::unordered_map<Vector2D<int>, std::variant<Vector2D<int>, int>>>;
@@ -27,7 +28,8 @@ class JsonLevelFormat
         {
             {"terrain", TERRAIN},
             {"entities", ENTITIES},
-            {"player", PLAYER}
+            {"player", PLAYER},
+            {"water", WATER}
 
         };
         std::unordered_map<Key, std::string> key_string_map_;

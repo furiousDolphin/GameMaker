@@ -113,6 +113,8 @@ class Rect
             rect_.y = v.y;
         }
 
+        inline Vector2D<int> get_shape() const { return {rect_.w, rect_.h}; }
+
         inline int get_right() const { return rect_.x + rect_.w; }
         inline int get_left() const { return rect_.x; }
         inline int get_top() const { return rect_.y; }
@@ -122,6 +124,12 @@ class Rect
         inline void set_left(int x) { rect_.x = x; }
         inline void set_top(int y) { rect_.y = y; }
         inline void set_bottom(int y) { rect_.y = y - rect_.h; }
+
+        inline int get_centerx() const { rect_.x - rect_.w/2; }
+        inline int get_centery() const { rect_.y - rect_.h/2; }
+
+        inline int set_centerx(int x) { rect_.x = x - rect_.w/2; }
+        inline int set_centery(int y) { rect_.y = y - rect_.h/2; }        
 
         inline constexpr int get_x() const { return rect_.x; }
         inline constexpr int get_y() const { return rect_.y; }
