@@ -24,9 +24,11 @@ class WaterCanvaObject
         friend WaterCanvaObjects;
         WaterCanvaObject(Vector2D<int> top_left, Vector2D<int> grid_shape = {1, 1});
         Rect* get_colliding_rect_ptr(Vector2D<int> p);
-
+        Vector2D<int> get_pos() const;
+        Vector2D<int> get_shape() const;
         void render(SDL_Renderer* renderer, Vector2D<int> origin) const;
     private:
+
 
         class SlideRect : public Rect
         {
@@ -50,6 +52,7 @@ class WaterCanvaObject
                 std::function<int(void)> getter_;  
                 std::function<void(int)> setter_;        
         };
+
 
         Rect main_r_;
         Rect boundary_r_;
@@ -102,7 +105,7 @@ class WaterCanvaObjects
             public:
                 GrabbedState();        
                 WaterCanvaObject& operator*() const;
-                explicit operator bool() const; 
+                operator bool() const; 
                 void clear(); 
                 void set_new(WaterCanvaObject* new_obj_ptr, Rect* new_rect_ptr, Vector2D<int> global_mouse_pos); 
                 void update(Vector2D<int> global_mouse_pos);

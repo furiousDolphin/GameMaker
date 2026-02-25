@@ -125,8 +125,8 @@ class Rect
         inline void set_top(int y) { rect_.y = y; }
         inline void set_bottom(int y) { rect_.y = y - rect_.h; }
 
-        inline int get_centerx() const { rect_.x - rect_.w/2; }
-        inline int get_centery() const { rect_.y - rect_.h/2; }
+        inline int get_centerx() const { return rect_.x - rect_.w/2; }
+        inline int get_centery() const { return rect_.y - rect_.h/2; }
 
         inline int set_centerx(int x) { rect_.x = x - rect_.w/2; }
         inline int set_centery(int y) { rect_.y = y - rect_.h/2; }        

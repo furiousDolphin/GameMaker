@@ -92,6 +92,10 @@ WaterCanvaObject::WaterCanvaObject(Vector2D<int> top_left, Vector2D<int> grid_sh
         {main_r_.set_bottom(std::max(arg, main_r_.get_top()+TILE_SIZE));}));
 }
 
+Vector2D<int> WaterCanvaObject::get_pos() const
+{ return main_r_.get_pos(); }
+Vector2D<int> WaterCanvaObject::get_shape() const
+{ return {main_r_.get_w(), main_r_.get_h()}; }
 
 Rect* WaterCanvaObject::get_colliding_rect_ptr(Vector2D<int> p)
 {
@@ -164,7 +168,7 @@ void WaterCanvaObjects::remove(std::vector<WaterCanvaObject>::reverse_iterator r
 void WaterCanvaObjects::export_data(JsonLevelFormat& json_level_format_data) const
 {
     for (const auto& water_canva_object : water_canva_objects_)
-    { json_level_format_data.add_to_export(JsonLevelFormat::WATER, water_canva_object.pos_, id); }    
+    { json_level_format_data.add_to_export(JsonLevelFormat::WATER, water_canva_object.get_pos(), water_canva_object.get_shape()); }    
 }
 
 void WaterCanvaObjects::import_data(const JsonLevelFormat& json_level_format_data)
@@ -257,7 +261,6 @@ WaterCanvaObjects::const_iterator WaterCanvaObjects::cend() const
 {return water_canva_objects_.cend();}
 
 
-
 WaterCanvaObjects::GrabbedState::GrabbedState() :
     active_{false},
     obj_ptr_{nullptr},
@@ -266,7 +269,7 @@ WaterCanvaObjects::GrabbedState::GrabbedState() :
 
 WaterCanvaObject& WaterCanvaObjects::GrabbedState::operator*() const 
 { return *obj_ptr_; }
-explicit WaterCanvaObjects::GrabbedState::operator bool() const 
+WaterCanvaObjects::GrabbedState::operator bool() const 
 { return active_; }
 void WaterCanvaObjects::GrabbedState::clear() 
 {
