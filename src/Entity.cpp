@@ -46,7 +46,7 @@ void Entity::Collisions::reset()
 }
 
 Player::Player(Vector2D<double> centre) :
-    Entity{centre, {32, 64}},
+    Entity{centre, {48, 48}},
     velocity_{0.0, 0.0},
     set_action_{true},
     in_the_air_{true}
@@ -58,7 +58,7 @@ void Player::update(const GraphicsManager& graphics_manager, const EventManager&
     if (set_action_)
     {   
         set_action_ = false; 
-        animation_ = graphics_manager.copy_animation(GraphicsManager::PLAYER_IDLE_RIGHT);
+        animation_ = graphics_manager.copy_animation(GraphicsManager::PLAYER_IDLE);
     }
     animation_.update(dt);
 

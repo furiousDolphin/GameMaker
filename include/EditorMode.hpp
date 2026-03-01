@@ -13,6 +13,7 @@
 #include "Button.hpp"
 #include "CanvaTile.hpp"
 #include "CanvaObject.hpp"
+#include "WaterCanvaObject.hpp"
 #include "EditorMenu.hpp"
 #include "PersistentState.hpp"
 
@@ -55,6 +56,7 @@ class EditorMode : public Mode
         EditorMenu menu_;
         CanvaTiles canva_tiles_;
         CanvaObjects canva_objects_;
+        WaterCanvaObjects water_canva_objects_;
 };
 
 

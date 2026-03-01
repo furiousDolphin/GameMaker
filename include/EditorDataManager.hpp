@@ -24,6 +24,7 @@ class EditorDataManager
 
         bool is_object(int id) const;
         bool is_tile(int id) const;
+        bool is_water_object(int id) const;
         const DataSeries& get_series(int id) const;
         void update( float dt);
         
@@ -51,6 +52,7 @@ class EditorDataManager
         std::unordered_map<int, DataSeries> data_;
         std::set<int> object_ids_;
         std::set<int> tile_ids_;
+        std::set<int> water_object_ids_;
 
         static inline std::string data_path_ = "editor_data.json";
 

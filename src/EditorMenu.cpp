@@ -48,7 +48,7 @@ void EditorMenu::create_data()
 {
     for ( const auto& [id, series] : context_.editor_data_manager )
     {
-        if ( series.menu != "" )
+        if ( series.menu != "" ) // zastapic za pomoca std::variant
         {
             auto it = textures_.find(series.menu);
             if ( it == textures_.end() )

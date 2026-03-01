@@ -38,7 +38,7 @@ class WaterCanvaObject
                     Vector2D<int> center, 
                     Vector2D<int> shape, 
                     SlideRect::Axis axis, 
-                    std::function<int(void)> getter,  
+                    std::function<Vector2D<int>(void)> getter,  
                     std::function<void(int)> setter);
 
                 void set_pos(Vector2D<int> new_top_left);
@@ -49,7 +49,7 @@ class WaterCanvaObject
 
             private:
                 Axis axis_;
-                std::function<int(void)> getter_;  
+                std::function<Vector2D<int>(void)> getter_;  
                 std::function<void(int)> setter_;        
         };
 
@@ -75,8 +75,8 @@ class WaterCanvaObjects
         void update();
         void render();
 
-        using iterator = std::vector<WaterCanvaObject>::iterator;
-        using const_iterator = std::vector<WaterCanvaObject>::const_iterator;
+        using iterator = std::list<WaterCanvaObject>::iterator;
+        using const_iterator = std::list<WaterCanvaObject>::const_iterator;
         iterator begin();
         iterator end();
         const_iterator begin() const;
@@ -86,8 +86,8 @@ class WaterCanvaObjects
 
     private:
         void add(Vector2D<int> pos, Vector2D<int> grid_shape = {1, 1});
-        void remove(std::vector<WaterCanvaObject>::iterator it);
-        void remove(std::vector<WaterCanvaObject>::reverse_iterator rit);
+        void remove(std::list<WaterCanvaObject>::iterator it);
+        void remove(std::list<WaterCanvaObject>::reverse_iterator rit);
 
 
         struct Context
@@ -118,6 +118,6 @@ class WaterCanvaObjects
         };
 
         GrabbedState grabbed_;
-        std::vector<WaterCanvaObject> water_canva_objects_;
+        std::list<WaterCanvaObject> water_canva_objects_;
 };
 #endif

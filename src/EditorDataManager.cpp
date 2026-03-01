@@ -14,10 +14,13 @@ EditorDataManager::EditorDataManager(GraphicsManager& graphics_manager) :
 
     for ( const auto& [id, series] : data_ )
     {
-        if ( series.type == "object" )
+        const auto& type = series.type;
+        if ( type == "object" )
         { object_ids_.insert(id); }
-        if ( series.type == "tile" )
+        else if ( type == "tile" )
         { tile_ids_.insert(id); }
+        else if ( type == "water_object" )
+        { water_object_ids_.insert(id); }
     }
 }
 
@@ -43,6 +46,9 @@ bool EditorDataManager::is_object(int id) const
 { return object_ids_.contains(id); }
 bool EditorDataManager::is_tile(int id) const
 { return tile_ids_.contains(id); }
+bool EditorDataManager::is_water_object(int id) const 
+{ return water_object_ids_.contains(id); }
+
 
 const EditorDataManager::DataSeries& EditorDataManager::get_series(int id) const
 { return data_.at(id); }

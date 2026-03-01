@@ -76,7 +76,8 @@ class GraphicsManager
             DIAMOND,
             GOLD,
             SILVER,
-            PARTICLE
+            PARTICLE,
+            PLAYER_IDLE
         };
 
         enum TextButtonKey
@@ -176,6 +177,7 @@ class GraphicsManager
             { "data/graphics/player/jump_right", PLAYER_JUMP_RIGHT },
             { "data/graphics/player/run_left",   PLAYER_RUN_LEFT },
             { "data/graphics/player/run_right",  PLAYER_RUN_RIGHT },
+            { "data/graphics/player/idle", PLAYER_IDLE },
 
             { "data/graphics/items/diamond",  DIAMOND },
             { "data/graphics/items/gold",     GOLD },
