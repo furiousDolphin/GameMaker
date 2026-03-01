@@ -61,6 +61,8 @@ target_link_libraries(base_module_library INTERFACE
 )
 
 target_compile_definitions(base_module_library INTERFACE WITHOUT_NUMPY SDL_MAIN_HANDLED)
+
+
 add_executable(GameMakerApp 
   main.cpp 
   src/SDL_Management.cpp
@@ -80,10 +82,20 @@ add_executable(GameMakerApp
   src/Entity.cpp
   src/Land.cpp
   src/JsonLevelFormat.cpp
-  src/WaterCanvaObject.cpp )
+  src/WaterCanvaObject.cpp
+  src/FileManagement.cpp )
 target_link_libraries(GameMakerApp PRIVATE base_module_library)
 
-set_target_properties(GameMakerApp PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE")
+set_target_properties(GameMakerApp PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE") #./build/GameMakerApp.exe
+
+
+
+add_executable(LandFilesLoader 
+  land_files.cpp 
+  src/FileManagement.cpp )
+target_link_libraries(LandFilesLoader PRIVATE base_module_library)
+
+set_target_properties(LandFilesLoader PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE")  #./build/LandFilesLoader.exe
 
 #---------------------------------------------------------
 

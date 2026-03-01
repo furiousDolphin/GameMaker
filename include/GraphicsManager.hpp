@@ -127,7 +127,7 @@ class GraphicsManager
     private:
         inline static std::unordered_map<std::string, VectorizedTextureKey> vectorized_textures_as_path_key_map
         {    
-            { "data/graphics/terrain/land", LAND }
+            { "data/graphics/terrain/folderek", LAND }
         };
 
         inline static std::unordered_map<std::string, SingularTextureKey> singular_textures_as_path_key_map
