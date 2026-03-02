@@ -26,6 +26,7 @@ class WaterCanvaObject
         Rect* get_colliding_rect_ptr(Vector2D<int> p);
         Vector2D<int> get_pos() const;
         Vector2D<int> get_shape() const;
+        void update();
         void render(SDL_Renderer* renderer, Vector2D<int> origin) const;
     private:
 
@@ -41,8 +42,9 @@ class WaterCanvaObject
                     std::function<Vector2D<int>(void)> getter,  
                     std::function<void(int)> setter);
 
-                void set_pos(Vector2D<int> new_top_left);
-                Vector2D<int> get_pos() const;
+                    void set_pos(const Vector2D<int>& new_top_left) override;
+                    Vector2D<int> get_pos() const override; 
+                    bool collide_point(const Vector2D<int>& v) const override;
 
                 enum Axis
                 { HORIZONTAL, VERTICAL };

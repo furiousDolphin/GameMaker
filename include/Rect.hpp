@@ -93,7 +93,7 @@ class Rect
             rect_.y = y;
         }
 
-        inline Vector2D<int> get_pos() const
+        virtual inline Vector2D<int> get_pos() const
         { 
             return { rect_.x, rect_.y };
         }
@@ -107,7 +107,7 @@ class Rect
             rect_.y = rect_.y + v.y;
         }
 
-        inline void set_pos( const Vector2D<int>& v ) 
+        virtual inline void set_pos( const Vector2D<int>& v ) 
         { 
             rect_.x = v.x;
             rect_.y = v.y;
@@ -125,8 +125,8 @@ class Rect
         inline void set_top(int y) { rect_.y = y; }
         inline void set_bottom(int y) { rect_.y = y - rect_.h; }
 
-        inline int get_centerx() const { return rect_.x - rect_.w/2; }
-        inline int get_centery() const { return rect_.y - rect_.h/2; }
+        inline int get_centerx() const { return rect_.x + rect_.w/2; }
+        inline int get_centery() const { return rect_.y + rect_.h/2; }
 
         inline int set_centerx(int x) { rect_.x = x - rect_.w/2; }
         inline int set_centery(int y) { rect_.y = y - rect_.h/2; }        
@@ -141,7 +141,7 @@ class Rect
         inline constexpr void set_w(int w) { rect_.w = w; }
         inline constexpr void set_h(int h) { rect_.h = h; }
 
-        bool collide_point(const Vector2D<int>& v) const
+        virtual bool collide_point(const Vector2D<int>& v) const
         {
             //doMorgan zamiast robić : 
             // auto a = rect_.x < v.x;

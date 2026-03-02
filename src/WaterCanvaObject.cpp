@@ -26,7 +26,7 @@ Vector2D<int> WaterCanvaObject::SlideRect::get_pos() const
 
 }
 
-void WaterCanvaObject::SlideRect::set_pos(Vector2D<int> new_top_left)
+void WaterCanvaObject::SlideRect::set_pos(const Vector2D<int>& new_top_left)
 {
     auto [x, y] = new_top_left;
     switch ( axis_ )
@@ -40,7 +40,15 @@ void WaterCanvaObject::SlideRect::set_pos(Vector2D<int> new_top_left)
     }
 }
 
-
+bool WaterCanvaObject::SlideRect::collide_point(const Vector2D<int>& v) const
+{
+    auto [x, y] = this->get_pos();
+    return !( 
+        x >= v.x || 
+        v.x >= x + rect_.w || 
+        y >= v.y || 
+        v.y >= y + rect_.h );
+}
 
 WaterCanvaObject::WaterCanvaObject(Vector2D<int> top_left, Vector2D<int> grid_shape) :
     main_r_{top_left, grid_shape.x*TILE_SIZE, grid_shape.y*TILE_SIZE},
@@ -54,7 +62,11 @@ WaterCanvaObject::WaterCanvaObject(Vector2D<int> top_left, Vector2D<int> grid_sh
         [this]()
         {return Vector2D<int>{main_r_.get_left(), main_r_.get_centery()};}, 
         [this](int arg)
-        {main_r_.set_left(std::min(arg, main_r_.get_right()-TILE_SIZE));}));
+        {
+            int new_arg = std::min(arg, main_r_.get_right()-TILE_SIZE);
+            main_r_.set_w(main_r_.get_right() - new_arg);
+            main_r_.set_left(new_arg);
+        }));
 
     //prawy
     slide_rects_.push_back(std::make_unique<SlideRect>(
@@ -64,7 +76,11 @@ WaterCanvaObject::WaterCanvaObject(Vector2D<int> top_left, Vector2D<int> grid_sh
         [this]()
         {return Vector2D<int>{main_r_.get_right(), main_r_.get_centery()};}, 
         [this](int arg)
-        {main_r_.set_right(std::max(arg, main_r_.get_left()+TILE_SIZE));}));
+        {
+            int new_arg = std::max(arg, main_r_.get_left()+TILE_SIZE);
+            main_r_.set_w(new_arg - main_r_.get_left());
+            main_r_.set_right(new_arg);
+        }));
 
     //gora
     slide_rects_.push_back(std::make_unique<SlideRect>(
@@ -74,7 +90,11 @@ WaterCanvaObject::WaterCanvaObject(Vector2D<int> top_left, Vector2D<int> grid_sh
         [this]()
         {return Vector2D<int>{main_r_.get_centerx(), main_r_.get_top()};}, 
         [this](int arg)
-        {main_r_.set_top(std::min(arg, main_r_.get_bottom()-TILE_SIZE));}));
+        {
+            int new_arg = std::min(arg, main_r_.get_bottom()-TILE_SIZE);
+            main_r_.set_h(main_r_.get_bottom() - new_arg);
+            main_r_.set_top(new_arg);
+        })); 
 
     //dol
     slide_rects_.push_back(std::make_unique<SlideRect>(
@@ -84,7 +104,11 @@ WaterCanvaObject::WaterCanvaObject(Vector2D<int> top_left, Vector2D<int> grid_sh
         [this]()
         {return Vector2D<int>{main_r_.get_centerx(), main_r_.get_bottom()};}, 
         [this](int arg)
-        {main_r_.set_bottom(std::max(arg, main_r_.get_top()+TILE_SIZE));}));
+        {
+            int new_arg = std::max(arg, main_r_.get_top()+TILE_SIZE);
+            main_r_.set_h(new_arg - main_r_.get_top());
+            main_r_.set_bottom(new_arg);
+        })); 
 }
 
 Vector2D<int> WaterCanvaObject::get_pos() const
@@ -96,10 +120,14 @@ Rect* WaterCanvaObject::get_colliding_rect_ptr(Vector2D<int> p)
 {
     if ( boundary_r_.collide_point(p) )
     {
+        std::cout << "boundary colliding\n"; 
         for ( auto& slide_rect_ptr : slide_rects_ )
         {
             if ( slide_rect_ptr->collide_point(p) )
-            { return slide_rect_ptr.get(); }
+            { 
+                std::cout << "slide_rect\n";
+                return slide_rect_ptr.get(); 
+            }
         }
 
         if ( main_r_.collide_point(p) )
@@ -108,6 +136,17 @@ Rect* WaterCanvaObject::get_colliding_rect_ptr(Vector2D<int> p)
     return nullptr;
 }
 
+void WaterCanvaObject::update()
+{ 
+    boundary_r_.set_pos(main_r_.get_pos() - main_r_.get_shape() / 8); 
+
+    Vector2D<int> new_shape = {
+        main_r_.get_w() + main_r_.get_w() / 4,
+        main_r_.get_h() + main_r_.get_h() / 4
+    };
+    boundary_r_.set_w(new_shape.x);
+    boundary_r_.set_h(new_shape.y); 
+}
 void WaterCanvaObject::render(SDL_Renderer* renderer, Vector2D<int> origin) const
 {
     SDL_Rect rect{ 
@@ -197,8 +236,8 @@ void WaterCanvaObjects::update()
     Vector2D<int> mouse_pos = event_manager.mouse_pos();
     Vector2D<int> global_mouse_pos = mouse_pos-origin;
 
-    // for ( auto& water_canva_object : water_canva_objects_ )
-    // { water_canva_object.update(); }
+    for ( auto& water_canva_object : water_canva_objects_ )
+    { water_canva_object.update(); }
 
     if (grabbed_)
     {
