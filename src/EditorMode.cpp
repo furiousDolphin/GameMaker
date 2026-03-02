@@ -72,7 +72,7 @@ void EditorMode::export_data()
     JsonLevelFormat json_level_format_data{context_.persistent_state.level};
     canva_tiles_.export_data(json_level_format_data);
     canva_objects_.export_data(json_level_format_data);
-    //water_canva_objects_.export_data(json_level_format_data);
+    water_canva_objects_.export_data(json_level_format_data);
     json_level_format_data.export_to_json();
 
     canva_tiles_.clear();
@@ -86,7 +86,8 @@ void EditorMode::import_data()
 
     canva_tiles_.import_data(json_level_format_data);
     canva_objects_.import_data(json_level_format_data);
-    //water_canva_objects_.import_data(json_level_format_data);
+    water_canva_objects_.import_data(json_level_format_data);
+    
 }
 
 void EditorMode::update()

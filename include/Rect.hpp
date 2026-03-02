@@ -114,6 +114,11 @@ class Rect
         }
 
         inline Vector2D<int> get_shape() const { return {rect_.w, rect_.h}; }
+        inline void set_shape(const Vector2D<int>& new_shape) 
+        {  
+            rect_.w = new_shape.x;
+            rect_.h = new_shape.y;
+        }
 
         inline int get_right() const { return rect_.x + rect_.w; }
         inline int get_left() const { return rect_.x; }
