@@ -6,13 +6,14 @@
 WaterObject::WaterObject(Vector2D<int> pos, Vector2D<int> shape) :
     rect_{pos, shape.x, shape.y}
 {
-
+    std::string L = std::to_string(shape.x/TILE_SIZE);
+    wave_eq_ptr_ = std::make_unique<WaveEquation>("u(0)=0", "u("+L+")=0", 3000.0, 20.0, 16);
+    x_dense_ = Eigen::VectorXd::LinSpaced(shape.x/4, pos.x, pos.x+shape.x);
+    wave_sim_ptr_ = std::make_unique<WaveSimulation>(*wave_eq_ptr_, x_dense_);
 }
 
-void WaterObject::update()
-{
-
-}
+void WaterObject::update(float dt)
+{ wave_sim_ptr_->update(dt); }
 
 void WaterObject::render(const SDL_Renderer* renderer, const Vector2D<int>& origin) const
 {
@@ -48,8 +49,8 @@ void WaterObject::render(const SDL_Renderer* renderer, const Vector2D<int>& orig
     { SDL_RenderGeometry(const_cast<SDL_Renderer*>(renderer), nullptr, vertices.data(), vertices.size(), nullptr, 0); }
 }
 
-WaterObjects::WaterObjects( const SDL_Renderer* renderer, const Vector2D<int>& origin) :
-    context_{renderer, origin}
+WaterObjects::WaterObjects( const SDL_Renderer* renderer, const Vector2D<int>& origin, const float& dt) :
+    context_{renderer, origin, dt}
 {
 
 }
