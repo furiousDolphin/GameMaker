@@ -51,10 +51,11 @@ bool WaterCanvaObject::SlideRect::collide_point(const Vector2D<int>& v) const
 }
 
 WaterCanvaObject::WaterCanvaObject(Vector2D<int> top_left, Vector2D<int> grid_shape) :
-    main_r_{top_left.to_grid(TILE_SIZE)*TILE_SIZE, grid_shape.x*TILE_SIZE, grid_shape.y*TILE_SIZE},
-    boundary_r_{main_r_.get_pos()-main_r_.get_shape()/8, TILE_SIZE+main_r_.get_w()/4, TILE_SIZE+main_r_.get_h()/4}
+    main_r_{top_left, grid_shape.x*TILE_SIZE, grid_shape.y*TILE_SIZE},
+    boundary_r_{main_r_.get_pos()-main_r_.get_shape()/8, main_r_.get_w()+main_r_.get_w()/4, main_r_.get_h()+main_r_.get_h()/4}
 {
     auto snap = [](int val) { return (val / TILE_SIZE) * TILE_SIZE; };
+    //auto snap = [&](int val) { return static_cast<int>(val / TILE_SIZE) - (val < 0 ? 1 : 0); };
 
     //lewy
     slide_rects_.push_back(std::make_unique<SlideRect>(
@@ -65,8 +66,7 @@ WaterCanvaObject::WaterCanvaObject(Vector2D<int> top_left, Vector2D<int> grid_sh
         {return Vector2D<int>{main_r_.get_left(), main_r_.get_centery()};}, 
         [this, snap](int arg)
         {
-            int snapped_arg = arg;
-            int new_arg = std::min(snapped_arg, main_r_.get_right()-TILE_SIZE);
+            int new_arg = std::min(arg, main_r_.get_right()-TILE_SIZE);
             main_r_.set_w(main_r_.get_right() - new_arg);
             main_r_.set_left(new_arg);
         }));
@@ -80,8 +80,7 @@ WaterCanvaObject::WaterCanvaObject(Vector2D<int> top_left, Vector2D<int> grid_sh
         {return Vector2D<int>{main_r_.get_right(), main_r_.get_centery()};}, 
         [this, snap](int arg)
         {
-            int snapped_arg = arg;
-            int new_arg = std::max(snapped_arg, main_r_.get_left()+TILE_SIZE);
+            int new_arg = std::max(arg, main_r_.get_left()+TILE_SIZE);
             main_r_.set_w(new_arg - main_r_.get_left());
             main_r_.set_right(new_arg);
         }));
@@ -95,8 +94,7 @@ WaterCanvaObject::WaterCanvaObject(Vector2D<int> top_left, Vector2D<int> grid_sh
         {return Vector2D<int>{main_r_.get_centerx(), main_r_.get_top()};}, 
         [this, snap](int arg)
         {
-            int snapped_arg = arg;
-            int new_arg = std::min(snapped_arg, main_r_.get_bottom()-TILE_SIZE);
+            int new_arg = std::min(arg, main_r_.get_bottom()-TILE_SIZE);
             main_r_.set_h(main_r_.get_bottom() - new_arg);
             main_r_.set_top(new_arg);
         })); 
@@ -110,8 +108,7 @@ WaterCanvaObject::WaterCanvaObject(Vector2D<int> top_left, Vector2D<int> grid_sh
         {return Vector2D<int>{main_r_.get_centerx(), main_r_.get_bottom()};}, 
         [this, snap](int arg)
         {
-            int snapped_arg = arg;
-            int new_arg = std::max(snapped_arg, main_r_.get_top()+TILE_SIZE);
+            int new_arg = std::max(arg, main_r_.get_top()+TILE_SIZE);
             main_r_.set_h(new_arg - main_r_.get_top());
             main_r_.set_bottom(new_arg);
         })); 
@@ -126,14 +123,10 @@ Rect* WaterCanvaObject::get_colliding_rect_ptr(Vector2D<int> p)
 {
     if ( boundary_r_.collide_point(p) )
     {
-        std::cout << "boundary colliding\n"; 
         for ( auto& slide_rect_ptr : slide_rects_ )
         {
             if ( slide_rect_ptr->collide_point(p) )
-            { 
-                std::cout << "slide_rect\n";
-                return slide_rect_ptr.get(); 
-            }
+            { return slide_rect_ptr.get(); }
         }
 
         if ( main_r_.collide_point(p) )
@@ -148,8 +141,11 @@ void WaterCanvaObject::update()
     { main_r_.set_pos(main_r_.get_pos().to_grid(TILE_SIZE)*TILE_SIZE); }
     else
     {
-        auto snap_floor = [](int val) { return (val / TILE_SIZE) * TILE_SIZE; };
-        auto snap_ceil  = [](int val) { return ((val + TILE_SIZE - 1) / TILE_SIZE) * TILE_SIZE; };
+        auto snap_floor = [](int val) 
+        { return static_cast<int>(std::floor(static_cast<float>(val) / TILE_SIZE)) * TILE_SIZE; };
+
+        auto snap_ceil = [](int val) 
+        { return static_cast<int>(std::ceil(static_cast<float>(val) / TILE_SIZE)) * TILE_SIZE; };
 
 
         int dirty_left   = main_r_.get_left();
@@ -243,7 +239,7 @@ void WaterCanvaObjects::export_data(JsonLevelFormat& json_level_format_data) con
     { 
         json_level_format_data.add_to_export(
             JsonLevelFormat::WATER, 
-            water_canva_object.get_pos().to_grid(TILE_SIZE), 
+            water_canva_object.get_pos(), 
             water_canva_object.get_shape().to_grid(TILE_SIZE)); 
     }    
 }
@@ -256,10 +252,10 @@ void WaterCanvaObjects::import_data(const JsonLevelFormat& json_level_format_dat
     auto it = data.find(JsonLevelFormat::WATER);
     if ( it != data.end() )
     {
-        for ( const auto& [grid_pos, val] : it->second )
+        for ( const auto& [vec2_pos, val] : it->second )
         {
             if ( const auto* grid_shape_ptr = std::get_if<Vector2D<int>>(&val) )
-            { water_canva_objects_.emplace_back(grid_pos*TILE_SIZE, *grid_shape_ptr); } 
+            { water_canva_objects_.emplace_back(vec2_pos, *grid_shape_ptr); } 
         }
     }
 }

@@ -15,6 +15,7 @@
 #include "PersistentState.hpp"
 #include "Land.hpp"
 #include "Entity.hpp"
+#include "WaterObject.hpp"
 
 
 
@@ -47,6 +48,7 @@ class GameMode : public Mode
         Buttons buttons_;
         Land land_;
         Entities entities_;
+        WaterObjects water_objects_;
         std::unique_ptr<Player> player_;
 };
 

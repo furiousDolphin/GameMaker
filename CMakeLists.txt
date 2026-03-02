@@ -83,7 +83,8 @@ add_executable(GameMakerApp
   src/Land.cpp
   src/JsonLevelFormat.cpp
   src/WaterCanvaObject.cpp
-  src/FileManagement.cpp )
+  src/FileManagement.cpp
+  src/WaterObject.cpp )
 target_link_libraries(GameMakerApp PRIVATE base_module_library)
 
 set_target_properties(GameMakerApp PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE") #./build/GameMakerApp.exe
