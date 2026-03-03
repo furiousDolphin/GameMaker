@@ -33,6 +33,9 @@ WaveEquation::WaveEquation(std::string left_BC_str, std::string right_BC_str, do
     c0_ = this->GetBCTargetsChebCoeffs();
     //b_tilde_0_ = R_*(L_hat_ * c0_);
     RS_QR_ = (R_*S_).colPivHouseholderQr();
+
+    M_solve_ = RS_QR_.solve(R_ * D_hat_sq_ * S_);
+    b_const_ = RS_QR_.solve(R_ * D_hat_sq_ * c0_);
 }
 
 void WaveEquation::operator()(const Eigen::VectorXd& X, Eigen::VectorXd& dXdt, double t)
@@ -40,12 +43,15 @@ void WaveEquation::operator()(const Eigen::VectorXd& X, Eigen::VectorXd& dXdt, d
     Eigen::VectorXd d = X.head( (N_+1)-2 );
     Eigen::VectorXd d_prim_t = X.tail( (N_+1)-2 );
 
-    Eigen::VectorXd c_bis_x = D_hat_sq_*(S_*d + c0_);
-    Eigen::VectorXd d_bis_x = RS_QR_.solve(R_*c_bis_x);
-    Eigen::VectorXd d_bis_t = c_sq_ * d_bis_x - gamma_*d_prim_t;
+    //Eigen::VectorXd c_bis_x = D_hat_sq_*(S_*d + c0_);
+    //Eigen::VectorXd d_bis_x = RS_QR_.solve(R_*c_bis_x);
+    //Eigen::VectorXd d_bis_t = c_sq_ * d_bis_x - gamma_*d_prim_t;
+
+    Eigen::VectorXd d_bis_t = c_sq_ * (M_solve_ * d + b_const_) - gamma_ * d_prim_t;
 
     dXdt.head( (N_+1)-2 ) = d_prim_t;
     dXdt.tail( (N_+1)-2 ) = d_bis_t;
+
 }
 
 WaveEquation::BCCoeffs WaveEquation::ParseBoundaryCondition(std::string expression)
@@ -182,7 +188,7 @@ WaveSimulation::WaveSimulation(const WaveEquation& wave_equation, const Eigen::V
     x_dense_{x_dense},
     accumulator_{0.0},
     t_{0.0},
-    dt_{0.0002},
+    dt_{0.0001},
     state_{2*( (eq_.N_+1)-2 )}
 {
     cheb_t_dense_ = ( -2.0/(eq_.x1_ - eq_.x2_) )*x_dense_.array() + ( (eq_.x1_ + eq_.x2_)/(eq_.x1_ - eq_.x2_) );
@@ -212,12 +218,21 @@ void WaveSimulation::step()
 
 void WaveSimulation::update(float sdl_dt)
 {
+    if (sdl_dt > 0.1f) 
+    { sdl_dt = 0.1f; } 
+
     accumulator_ += sdl_dt;
-    while (accumulator_ >= dt_) 
+    
+    int max_steps_per_frame = 50;
+    while (accumulator_ >= dt_ && max_steps_per_frame > 0) 
     {
         this->step(); 
         accumulator_ -= dt_;
+        max_steps_per_frame--;
     }
+
+    if (max_steps_per_frame == 0) 
+    { accumulator_ = 0; }
 }
 
 std::pair<Eigen::VectorXd, Eigen::VectorXd> WaveSimulation::get_u_v()

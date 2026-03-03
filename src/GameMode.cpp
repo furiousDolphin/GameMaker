@@ -71,9 +71,20 @@ void GameMode::update()
 
     
 
+    // Vector2D<double> center = player_->get_center();
+    // render_scroll_.x += (center.x - WIDTH/2 - render_scroll_.x) / 1000.0;
+    // render_scroll_.y += (center.y - HEIGHT/2 - render_scroll_.y) / 1000.0;
+
+    // origin_ = static_cast<Vector2D<int>>(render_scroll_);
+
+    float smoothness = 5.0f; 
     Vector2D<double> center = player_->get_center();
-    render_scroll_.x += (center.x - WIDTH/2 - render_scroll_.x) / 1000.0;
-    render_scroll_.y += (center.y - HEIGHT/2 - render_scroll_.y) / 1000.0;
+    Vector2D<double> target = { center.x - WIDTH/2, center.y - HEIGHT/2 };
+
+    double factor = 1.0 - std::exp(-smoothness * context_.dt);
+
+    render_scroll_.x += (target.x - render_scroll_.x) * factor;
+    render_scroll_.y += (target.y - render_scroll_.y) * factor;
 
     origin_ = static_cast<Vector2D<int>>(render_scroll_);
 }
@@ -88,7 +99,7 @@ void GameMode::render()
     buttons_.render();
     entities_.render();
     player_->render(origin_);
-    //water_objects_.render();
+    water_objects_.render();
     
     SDL_RenderPresent( renderer );
 }

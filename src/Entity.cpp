@@ -6,7 +6,6 @@ Entity::Entity(Vector2D<double> centre, Vector2D<int> shape) :
     pos_{centre-static_cast<Vector2D<double>>(shape)/2.0},
     shape_{shape}
 {
-    std::cout << "doszlo do playera" << "\n";
     auto [w, h] = shape;
 
     int tiles_w = static_cast<int>(std::ceil(static_cast<float>(w) / TILE_SIZE));
@@ -20,7 +19,6 @@ Entity::Entity(Vector2D<double> centre, Vector2D<int> shape) :
         for (int row = -range_y; row <= range_y; row++)
         { neighbour_offsets_.emplace_back(row, col); }
     }
-    std::cout << "skonczylo playera" << "\n";
 }
 
 Vector2D<double> Player::get_center() const

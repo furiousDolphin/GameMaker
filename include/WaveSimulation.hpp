@@ -55,6 +55,8 @@ class WaveEquation
         Eigen::VectorXd c0_;
         Eigen::VectorXd b_tilde_0_;
         Eigen::ColPivHouseholderQR<Eigen::MatrixXd> RS_QR_;
+        Eigen::MatrixXd M_solve_;
+        Eigen::VectorXd b_const_;
 
 
 };
