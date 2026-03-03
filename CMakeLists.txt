@@ -8,8 +8,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_modules)
 
-set(SDL2_PATH "E:/SDL2_VC/SDL2-2.32.4")
+#set(SDL2_PATH "E:/SDL2_VC/SDL2-2.32.4")
+#set(CMAKE_PREFIX_PATH ${SDL2_PATH})
+
+set(SDL2_PATH "${CMAKE_CURRENT_SOURCE_DIR}/external/SDL2")
 set(CMAKE_PREFIX_PATH ${SDL2_PATH})
+
 
 include(FetchContent)
 FetchContent_Declare(
@@ -42,7 +46,7 @@ target_include_directories(base_module_library INTERFACE
     ${PROJECT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${Python_INCLUDE_DIRS}
-    "E:/boost_math_cpp/boost_1_88_0"
+    "${CMAKE_CURRENT_SOURCE_DIR}/external/boost_headers"
     "${SDL2_PATH}/include"
     "${SDL2_PATH}/include/SDL2"
     ${SDL2_INCLUDE_DIRS}
@@ -91,7 +95,21 @@ target_link_libraries(GameMakerApp PRIVATE base_module_library)
 
 set_target_properties(GameMakerApp PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE") #./build/GameMakerApp.exe
 
+set(SDL2_DLLS
+    "${SDL2_PATH}/lib/x64/SDL2.dll"
+    "${SDL2_PATH}/lib/x64/SDL2_image.dll"
+    "${SDL2_PATH}/lib/x64/SDL2_ttf.dll"
+    "${SDL2_PATH}/lib/x64/SDL2_mixer.dll"
+)
 
+foreach(dll ${SDL2_DLLS})
+    add_custom_command(TARGET GameMakerApp POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${dll}"
+        $<TARGET_FILE_DIR:GameMakerApp>
+        COMMENT "Kopiowanie ${dll} do folderu build..."
+    )
+endforeach()
 
 add_executable(LandFilesLoader 
   land_files.cpp 
@@ -99,6 +117,15 @@ add_executable(LandFilesLoader
 target_link_libraries(LandFilesLoader PRIVATE base_module_library)
 
 set_target_properties(LandFilesLoader PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE")  #./build/LandFilesLoader.exe
+
+foreach(dll ${SDL2_DLLS})
+    add_custom_command(TARGET LandFilesLoader POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${dll}"
+        $<TARGET_FILE_DIR:LandFilesLoader>
+        COMMENT "Kopiowanie ${dll} do folderu build..."
+    )
+endforeach()
 
 #---------------------------------------------------------
 
