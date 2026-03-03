@@ -42,7 +42,6 @@ venv/
 *.lib
 *.exp
 
-
 .vscode/
 
 external/SDL2*

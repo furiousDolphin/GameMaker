@@ -32,7 +32,7 @@ void WaterObject::render(const SDL_Renderer* renderer, const Vector2D<int>& orig
     int left = rect_.get_left();
     int right = rect_.get_right();
     int bottom = rect_.get_bottom();
-    float top_level = 0.75*TILE_SIZE;
+    float top_level = rect_.get_h() - 0.25*TILE_SIZE;
 
     auto [u, _] = wave_sim_ptr_->get_u_v();
     float step_x = (right - left) / (float)(u.size() - 1);
@@ -69,6 +69,7 @@ WaterObjects::WaterObjects( const SDL_Renderer* renderer, const Vector2D<int>& o
 {
 
 }
+
 void WaterObjects::load_level(const JsonLevelFormat& json_level_format_data)
 {
     const auto& data = json_level_format_data.get_import_data();
