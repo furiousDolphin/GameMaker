@@ -17,3 +17,5 @@ Eigen::VectorXd EvaluateCheb( const Eigen::VectorXd& c, const Eigen::VectorXd& X
 Eigen::VectorXd ChebCoeffs(const Eigen::VectorXd& f_values);
 Eigen::MatrixXd ChebMassMatrix(int N);
 Eigen::VectorXd InterpolateToChebNodes( const Eigen::VectorXd& x_dense, const Eigen::VectorXd& y_dense, const Eigen::VectorXd& cheb_nodes);
+
+#endif

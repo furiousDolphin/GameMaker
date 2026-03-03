@@ -20,7 +20,7 @@ GameMode::GameMode(
     land_{graphics_manager, origin_},
     entities_{graphics_manager, event_manager, land_, dt, origin_},
     player_{nullptr},
-    water_objects_{renderer, origin_}
+    water_objects_{renderer, origin_, dt}
 {
     this->create_buttons();
 }
@@ -67,7 +67,7 @@ void GameMode::update()
     buttons_.update();
     entities_.update();
     player_->update(context_.graphics_manager, context_.event_manager, land_, context_.dt);
-    water_objects_.update();
+    //water_objects_.update();
 
     
 
@@ -88,7 +88,7 @@ void GameMode::render()
     buttons_.render();
     entities_.render();
     player_->render(origin_);
-    water_objects_.render();
+    //water_objects_.render();
     
     SDL_RenderPresent( renderer );
 }
