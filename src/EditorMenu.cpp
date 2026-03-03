@@ -37,9 +37,7 @@ void EditorMenu::create_buttons()
     auto& id = context_.canva_id;
 
     buttons_.add(std::make_unique<EditorMenuButton>( rect_.get_pos() + Vector2D<int>( margin, margin), [&id]( int new_id ) { id = new_id; }, &textures_.at("terrain"), nullptr ));
-    buttons_.add(std::make_unique<EditorMenuButton>( rect_.get_pos() + Vector2D<int>( 3*margin + TILE_SIZE, margin), [&id]( int new_id ) { id = new_id; }, &textures_.at("enemy"), nullptr ));
-    buttons_.add(std::make_unique<EditorMenuButton>( rect_.get_pos() + Vector2D<int>( margin, 3*margin + TILE_SIZE), [&id]( int new_id ) { id = new_id; }, &textures_.at("coin"), nullptr ));
-    buttons_.add(std::make_unique<EditorMenuButton>( rect_.get_pos() + Vector2D<int>( 3*margin + TILE_SIZE, 3*margin + TILE_SIZE), [&id]( int new_id ) { id = new_id; }, &textures_.at("palm fg"), &textures_.at("palm bg") ));
+    buttons_.add(std::make_unique<EditorMenuButton>( rect_.get_pos() + Vector2D<int>( 3*margin + TILE_SIZE, margin), [&id]( int new_id ) { id = new_id; }, &textures_.at("water"), nullptr ));
 
 
 }

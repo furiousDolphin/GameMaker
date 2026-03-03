@@ -37,15 +37,12 @@ int main()
                 std::string str_forbidden_sides = stem_file_name.substr(sep+1);
                 for ( char c : str_forbidden_sides )
                 { file_data.forbidden_sides.insert(c); }
-
-                std::cout << "tworze : " << std::setw(5) << str_required_sides << " " << std::setw(5) << str_forbidden_sides << "\n";
             }
             loading_land_datas.push_back(file_data);
         }
     }
 
     auto combinations = get_combinations<char>(sides.begin(), sides.end());
-    std::cout << "len(combinations) : " << combinations.size() << "\n";
     
     for (const auto& combination : combinations) 
     {
@@ -53,12 +50,10 @@ int main()
 
         for (const auto& file_data : loading_land_datas) 
         {
-            std::cout << "-------------------------------------------" << "\n";
             bool match = true;
 
             for (char req : file_data.required_sides) 
             {
-                std::cout << "req" << req << "\n";
                 if (!comb_set.contains(req)) 
                 {
                     match = false;
@@ -71,7 +66,6 @@ int main()
 
             for (char forb : file_data.forbidden_sides) 
             {
-                std::cout << "forb" << forb << "\n";
                 if (comb_set.contains(forb)) 
                 {
                     match = false;
@@ -90,7 +84,7 @@ int main()
                 if (new_name.empty()) 
                 { new_name = "X"; }
 
-                fs::path destination_folder = "folderek";
+                fs::path destination_folder = "data/graphics/terrain/land/";
                 fs::path destination_file_path = destination_folder / (new_name + ".png");
 
                 try 
@@ -99,8 +93,6 @@ int main()
                     { fs::create_directories(destination_folder); }
 
                     fs::copy(file_data.path, destination_file_path, fs::copy_options::overwrite_existing);
-                    std::cout << "wykonuje : " << std::setw(30) << file_data.path << " " << std::setw(30) << destination_file_path << "\n";
-
                     break; 
                 } 
                 catch (const fs::filesystem_error& e) 

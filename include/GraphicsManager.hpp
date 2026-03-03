@@ -128,61 +128,17 @@ class GraphicsManager
     private:
         inline static std::unordered_map<std::string, VectorizedTextureKey> vectorized_textures_as_path_key_map
         {    
-            { "data/graphics/terrain/folderek", LAND }
+            { "data/graphics/terrain/land", LAND }
         };
 
         inline static std::unordered_map<std::string, SingularTextureKey> singular_textures_as_path_key_map
         {
-            { "data/graphics/clouds/Small Cloud 1.png", CLOUD_SMALL },
-            { "data/graphics/clouds/Small Cloud 2.png", CLOUD_MIDDLE },
-            { "data/graphics/clouds/Small Cloud 3.png", CLOUD_BIG },
 
-            { "data/graphics/cursors/mouse.png",  CURSOR_MOUSE },
-            { "data/graphics/cursors/handle.png", CURSOR_HANDLE },
-
-            { "data/graphics/enemies/pearl/pearl.png",   PEARL },
-
-            { "data/graphics/terrain/water/water_bottom.png", WATER_BOTTOM }
         };  
 
         inline static std::unordered_map<std::string, AnimationKey> animations_as_path_key_map
         {
-            { "data/graphics/terrain/water/animation", WATER_TOP },
-            { "data/graphics/enemies/spikes", SPIKES },
-
-            { "data/graphics/enemies/shell_left/attack", LEFT_SHELL_ATTACK },
-            { "data/graphics/enemies/shell_left/idle",   LEFT_SHELL_IDLE },
-
-            { "data/graphics/enemies/shell_right/attack", RIGHT_SHELL_ATTACK },
-            { "data/graphics/enemies/shell_right/idle",   RIGHT_SHELL_IDLE },
-
-            { "data/graphics/enemies/tooth/idle",      TOOTH_IDLE },
-            { "data/graphics/enemies/tooth/run_left",  TOOTH_RUN_LEFT },
-            { "data/graphics/enemies/tooth/run_right", TOOTH_RUN_RIGHT },
-
-            { "data/graphics/terrain/palm/large_bg", PALM_LARGE_BG },
-            { "data/graphics/terrain/palm/large_fg", PALM_LARGE_FG },
-            { "data/graphics/terrain/palm/left_bg",  PALM_LEFT_BG },
-            { "data/graphics/terrain/palm/left_fg",  PALM_LEFT_FG },
-            { "data/graphics/terrain/palm/right_bg", PALM_RIGHT_BG },
-            { "data/graphics/terrain/palm/right_fg", PALM_RIGHT_FG },
-            { "data/graphics/terrain/palm/small_bg", PALM_SMALL_BG },
-            { "data/graphics/terrain/palm/small_fg", PALM_SMALL_FG },
-
-            { "data/graphics/player/fall_left",  PLAYER_FALL_LEFT },
-            { "data/graphics/player/fall_right", PLAYER_FALL_RIGHT },
-            { "data/graphics/player/idle_left",  PLAYER_IDLE_LEFT },
-            { "data/graphics/player/idle_right", PLAYER_IDLE_RIGHT },
-            { "data/graphics/player/jump_left",  PLAYER_JUMP_LEFT },
-            { "data/graphics/player/jump_right", PLAYER_JUMP_RIGHT },
-            { "data/graphics/player/run_left",   PLAYER_RUN_LEFT },
-            { "data/graphics/player/run_right",  PLAYER_RUN_RIGHT },
             { "data/graphics/player/idle", PLAYER_IDLE },
-
-            { "data/graphics/items/diamond",  DIAMOND },
-            { "data/graphics/items/gold",     GOLD },
-            { "data/graphics/items/silver",   SILVER },
-            { "data/graphics/items/particle", PARTICLE }
         };
 
         std::unordered_map< AnimationKey, Animation > animations_as_map_;
