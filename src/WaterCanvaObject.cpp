@@ -223,7 +223,7 @@ void WaterCanvaObjects::add(Vector2D<int> pos, Vector2D<int> grid_shape)
     const auto& series = context_.editor_data_manager.get_series(context_.canva_id);
     const auto& style = series.style;
     if ( style == "water" )
-    { water_canva_objects_.emplace_back(pos, grid_shape); }
+    { water_canva_objects_.emplace_back(pos.to_grid(TILE_SIZE)*TILE_SIZE, grid_shape); }
 }
 void WaterCanvaObjects::remove(std::list<WaterCanvaObject>::iterator it)
 { water_canva_objects_.erase(it); }
