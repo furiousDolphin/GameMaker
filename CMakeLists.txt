@@ -46,7 +46,7 @@ target_include_directories(base_module_library INTERFACE
     ${PROJECT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${Python_INCLUDE_DIRS}
-    "${CMAKE_CURRENT_SOURCE_DIR}/external/boost_headers"
+    "E:/boost_math_cpp/boost_1_88_0"
     "${SDL2_PATH}/include"
     "${SDL2_PATH}/include/SDL2"
     ${SDL2_INCLUDE_DIRS}
@@ -138,4 +138,6 @@ endforeach()
 # target_link_libraries(module_dos PRIVATE base_module_library)
 
 #---------------------------------------------------------
+
+
 
